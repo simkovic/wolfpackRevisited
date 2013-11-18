@@ -7,7 +7,7 @@ import numpy as np
 
 from Settings import Q
 from Constants import *
-try: from Tobii import TobiiController,TobiiControllerFromOutput
+try: from eyetracking.Tobii import TobiiController
 except: print 'Tobii import failed'
 
  
@@ -40,9 +40,9 @@ class Gao10e3Experiment():
         self.block=vpInfo[1]
         self.initTrial=vpInfo[-2]
         self.isDart= vpInfo[-1] == 'dart'
-        print self.isDart, vpInfo[-1]
         # save settings, which we will use
         Q.save(Q.inputPath+'vp%03d'%self.id+Q.delim+'SettingsExp.pkl')
+        self.output = open(Q.outputPath+'vp%03d.res'%self.id,'a')
         #init stuff
         self.wind=Q.initDisplay()
         # init text
@@ -88,7 +88,8 @@ class Gao10e3Experiment():
         clr=np.ones((self.cond,3))
         if np.any(sel): 
             clr[sel,1]=-1;clr[sel,2]=-1
-            if not self.tone.onn and self.block<2: self.tone.play();self.tone.onn=True
+            if not self.tone.onn and self.block<2 and self.id>350: 
+                self.tone.play();self.tone.onn=True
         elif self.tone.onn: self.tone.stop(); self.tone.onn=False
         if self.f==Q.nrframes-1 and self.tone.onn: self.tone.stop(); self.tone.onn=False
         if self.block!=2: self.elem.setColors(clr)
@@ -100,7 +101,6 @@ class Gao10e3Experiment():
     def getJudgment(self):
         qmap=self.quadMaps[int(self.trialType[self.t])]
         if self.block!=2:
-            self.text3.setText(' ')
             self.mouse.clickReset()
             self.mouse.setPointer(self.pnt2)
             mkey=self.mouse.getPressed()
@@ -124,7 +124,7 @@ class Gao10e3Experiment():
                     valid2.append(ag)
             valid = list(set(valid1) & set(valid2))
             if not valid: # select at random 
-                print 'search failed'
+                #print 'search failed'
                 ag=ags[np.random.randint(3)]
             elif valid:
                 ag=valid[np.random.randint(len(valid))]
@@ -133,10 +133,7 @@ class Gao10e3Experiment():
             elif valid2:
                 ag=valid2[np.random.randint(len(valid2))]
             else: print 'does never happen'
-            if qmap[ag/3]==0: 
-                print 'is Wolf'
-                self.wolfcount+=1
-            else: print 'no Wolf'
+            if qmap[ag/3]==0: self.wolfcount+=1
             #print self.oris[ag],self.oris.shape
             self.pos[ag,:]=np.inf # make it disappear
             self.epos[self.cond+ag,:]=np.inf; self.epos[ag,:]=np.inf
@@ -150,7 +147,6 @@ class Gao10e3Experiment():
                 self.elem.draw()
                 if self.repmom==0 and not self.isDart:  self.eyes.draw()
                 self.pnt1.draw()
-                self.text3.draw()
                 self.mouse.draw()
                 self.wind.flip()
                 mkey=self.mouse.getPressed()
@@ -160,11 +156,11 @@ class Gao10e3Experiment():
         else: 
             self.output.write('\t%d\t%.3f\t%d\t%d\t%.3f\t%.3f\t-1'%(self.trialType[self.t],
                 self.repmom,self.asel[0],self.asel[1],self.oris[self.asel[0]],self.oris[self.asel[1]]))
-        self.output.flush()
         np.save(Q.inputPath+'vp%03d/chsVp%03db%dtrial%03d.npy' % (self.id,self.id,self.block,self.t),self.chasee)
         return False
     def runTrial(self,replay=False):
         self.repmom=self.manipType[self.t]
+        print self.t
         if self.block==2:
             q=np.random.permutation(4)
             q0= np.array(self.quadMaps[int(self.trialType[self.t])]).nonzero()[0]
@@ -212,9 +208,12 @@ class Gao10e3Experiment():
                     core.quit()
                     sys.exit()
             self.f+=1
+        self.output.write('%d\t%d\t%d\t%s'%(self.id,self.block,self.t,int(self.permut[self.t])))
+        self.getJudgment()
         self.wind.flip()
         core.wait(1.0)
         self.output.write('\n')
+        self.output.flush()
         
     def bringMouseToPosition(self):
         if self.block!=2:
@@ -226,6 +225,7 @@ class Gao10e3Experiment():
             # ask subject to bring the mouse on the position
             self.mouse.clickReset()
             mpos=np.array(mpos).squeeze()
+        else: mpos=np.squeeze(self.traj[0,self.asel[0],:2]+self.traj[0,self.asel[1],:2])/2.0
         self.pnt1.setPos(mpos)
         mkey=self.mouse.getPressed()
         mp=np.array([np.inf,np.inf]); pN=0
@@ -243,7 +243,8 @@ class Gao10e3Experiment():
         self.tone=sound.SoundPygame(value='A',secs=5)
         self.tone.onn=False
         if not self.isDart: manip=[0.05,0.1,0.15,0.2,0.25,0.3]
-        else: manip=[-0.2,-0.4]
+        elif self.id<371: manip=[-0.2,-0.4]
+        else: manip=[0.2,0.4]
         if self.block==1:
             NT= 2; temp=[]
             for n in range(NT): temp.append(np.ones(self.nrtrials/NT)*manip[n])
@@ -275,7 +276,6 @@ class Gao10e3Experiment():
         self.pnt2=visual.ShapeStim(self.wind,interpolate=False, 
             vertices=[(-0.5,0),(-0,0),(0,0.5),(0,0),(0.5,0),(0,-0),(0,-0.5),(-0,0), (-0.5,0)],
             closeShape=False,lineColor='gray')
-        self.output = open(Q.outputPath+'vp%03d.res'%self.id,'a')
         # loop trials
         for trial in range(self.initTrial,self.nrtrials):   
             self.t=trial
@@ -296,7 +296,8 @@ class Gao10e3Experiment():
         self.text1.draw()
         self.wind.flip()
         core.wait(2)
-        self.text1.setText(u'Gleich sehen Sie einen Pfeil verschwinden')
+        if self.isDart: self.text1.setText(u'Gleich sehen Sie einen Pfeil verschwinden')
+        else: self.text1.setText(u'Gleich sehen Sie einen Kreis verschwinden')
         self.text2.setText(u'Bitte zeigen Sie seine letzte Position an')
         self.text1.draw(); self.text2.draw()
         self.wind.flip()
@@ -305,7 +306,8 @@ class Gao10e3Experiment():
         self.pos=np.ones((self.cond,2))*50
         self.oris=np.zeros(self.pos.shape[0]) 
         for k in range(13):
-            self.oris[0]=(2*np.pi*np.random.rand()-np.pi)/np.pi*180
+            if self.isDart: self.oris[0]=(2*np.random.rand()-1)*180
+            else: self.oris[0]=(2*np.pi*np.random.rand()-np.pi)
             self.pos[0,Y]=0
             self.pos[0,X]=3*(k%5)-6
             
@@ -332,12 +334,13 @@ class Gao10e3Experiment():
                 mkey=self.mouse.getPressed()
             mpos=self.mouse.getPos()
             self.output.write('%d\t%d\t%d\t%.3f\t%.3f\t%.3f\t-1\t-1\t-1\t-1\t-1\n'%(self.id,self.block,k,self.oris[0],float(mpos[0]),float(mpos[1])))
-
+    def getf(self):
+        return self.f
         
 class TobiiExperiment(Gao10e3Experiment):
     def __init__(self):
         Gao10e3Experiment.__init__(self)
-        self.eyeTracker = TobiiController(self.getWind(),self.getf,sid=self.id,block=self.block)
+        self.eyeTracker = TobiiController(self.wind,self.getf,sid=self.id,block=self.block)
         self.eyeTracker.sendMessage('Monitor Distance\t%f'% self.wind.monitor.getDistance())
         self.eyeTracker.doMain()
     def run(self):
@@ -346,7 +349,7 @@ class TobiiExperiment(Gao10e3Experiment):
     def runTrial(self,*args):
         self.eyeTracker.preTrial(False)#self.t,False,self.getWind(),autoDrift=True)
         self.eyeTracker.sendMessage('Trial\t%d'%self.t)
-        Gao10e3Experiment.runTrial(self,*args,fixCross=True)
+        Gao10e3Experiment.runTrial(self,*args)
         self.eyeTracker.postTrial()
     def getJudgment(self,*args):
         self.eyeTracker.sendMessage('Detection')
@@ -393,8 +396,9 @@ class DataReplay(Gao10e3Experiment):
         Gao10e3Experiment.runTrial(self,*args,replay=True)
 
 if __name__ == '__main__':
+    E=TobiiExperiment()
     #E=Gao10e3Experiment()
-    E=DataReplay()
+    #E=DataReplay()
     E.run()
 
 
