@@ -296,7 +296,8 @@ class Gao10e3Experiment():
         self.text1.draw()
         self.wind.flip()
         core.wait(2)
-        if self.isDart: self.text1.setText(u'Gleich sehen Sie einen Pfeil verschwinden')
+        shp=['Kreis','Pfeil']
+        self.text1.setText(u'Gleich sehen Sie einen %s verschwinden'%shp[int(self.isDart)])
         else: self.text1.setText(u'Gleich sehen Sie einen Kreis verschwinden')
         self.text2.setText(u'Bitte zeigen Sie seine letzte Position an')
         self.text1.draw(); self.text2.draw()
@@ -306,6 +307,7 @@ class Gao10e3Experiment():
         self.pos=np.ones((self.cond,2))*50
         self.oris=np.zeros(self.pos.shape[0]) 
         for k in range(13):
+            if k>4: self.text2.setText(u'Bitte klicken Sie die Position wo der %s steht an'%shp[int(self.isDart)])
             if self.isDart: self.oris[0]=(2*np.random.rand()-1)*180
             else: self.oris[0]=(2*np.pi*np.random.rand()-np.pi)
             self.pos[0,Y]=0
@@ -314,9 +316,11 @@ class Gao10e3Experiment():
             self.elem.setXYs(self.pos)
             self.elem.setOris(self.oris)
             epos = np.concatenate([self.pos,self.pos])
-            epos[0,X]+= np.cos(self.oris[0]+0.345)*0.71; epos[0,Y]+= np.sin(self.oris[0]+0.345)*0.71
-            epos[0+self.cond,X]+= np.cos(self.oris[0]-0.345)*0.71; epos[0+self.cond,Y]+= np.sin(self.oris[0]-0.345)*0.71
-            
+            epos[0,X]+= np.cos(self.oris[0]+0.345)*0.71
+            epos[0,Y]+= np.sin(self.oris[0]+0.345)*0.71
+            epos[0+self.cond,X]+= np.cos(self.oris[0]-0.345)*0.71
+            epos[0+self.cond,Y]+= np.sin(self.oris[0]-0.345)*0.71
+            self.text2.draw()
             self.elem.draw()
             if k<10 and not self.isDart: 
                 self.eyes.setXYs(epos)
