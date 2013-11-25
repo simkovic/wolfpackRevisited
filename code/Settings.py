@@ -104,10 +104,8 @@ tobiilab={'monitor' :   t60,
         'trialDur':     17,                 # in seconds
         'aSpeed':       7.8,               # in degrees of visual angle per second
         'guiPos':       (-800,400),          # in pixels
-        'winPos':       (1280,0),              # in pixels
-        'fullscr':      False}
+        'winPos':       (0,0),              # in pixels
+        'fullscr':      True}
         
 
-Q=Settings(**laptop)
-    
-#Q=Settings(**tobiilab)
+Q=Settings(**tobiilab)
