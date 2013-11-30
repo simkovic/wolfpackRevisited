@@ -7,15 +7,14 @@ from scipy.stats import nanmean as mean
 from scipy.stats import nanmedian as median
 from scipy.stats import nanstd as std
 from scipy.stats import scoreatpercentile as sap
-from matusplotlib.plottingroutines import getColors,errorbar
+from matusplotlib.plottingroutines import *
 #some constants and settings
 TRAJPATH='/home/matus/Desktop/research/wolfpackRevisited/trajData/'
 BEHDPATH='/home/matus/Desktop/research/wolfpackRevisited/behData/'
 FIGPATH='/home/matus/Desktop/research/wolfpackRevisited/paper/fig/'
-#TRAJPATH='../trajData/'
-#BEHDPATH='../behData/'
+
 X=0;Y=1;M=0;P=1;W=2
-man=[-0.15,-0.05,0.05,0.1,0.15,0.2,0.25,0.3]
+man=[-0.15,-0.05,0.05,0.1,0.15,0.2,0.25,0.3,-0.2,-0.4,0.4]
 quadMaps=[[1,1,0,0],[0,0,1,1],[0,1,0,1],[1,0,1,0],[1,0,0,1],[0,1,1,0]]
 T=42 # number of trials
 TDUR=17.0 # trial duration in seconds
@@ -51,7 +50,8 @@ def drawDartAgent(pos,scale=1,ori=0,bcgclr=True,eyes=True,rc=0.9):
             ec=[rc]*3,zorder=-3,clip_on=False)
     ax.add_patch(c)
 
-def loadDataB12(vpn):
+def loadDataB12(vpn,correct=False):
+    ''' correct undoes the manipulation from block 2'''
     D=np.zeros((len(vpn),2,T,11))*np.nan
     for i in range(len(vpn)):
         vp=vpn[i]
@@ -94,6 +94,9 @@ def loadDataB12(vpn):
                     D[i,b,t,3]+=(np.sqrt(np.power(traj[:,a,:2]-ms,
                                 2).sum(1))<AR+CHR).mean()
             phiRM=C[:,7]# nose orientation
+            if correct and np.any(C[:,5]!=0): # undo the manipulation
+                corr= np.array([np.cos(phiRM)*C[:,5],np.sin(phiRM)*C[:,5]])
+                posA+= corr.T
             phiC=np.arctan2(posC[:,Y]-posA[:,Y],posC[:,X]-posA[:,X]) # mouse ori
             d=C[:,[8,9]]-posA
             phiD= np.arctan2(d[:,Y],d[:,X]) # judgment displacement ori
@@ -107,6 +110,11 @@ def loadDataB12(vpn):
             D[i,b,:,8]=phiC 
             D[i,b,:,9]=phiRM
             D[i,b,:,10]=C[:,5]
+            # for latter estimation we remove zeros and ones
+            owt=D[:,:,:,0]
+            owt[owt>0.999]=0.999
+            owt[owt<0.001]=0.001
+            # note, now we have changed the values in D
     return D
 
 
@@ -242,26 +250,27 @@ def plotB5(B5,vpn,clrs=None,exp=1,suffix=''):
         plt.gca().set_aspect('equal')
         plt.xlim([-1,1]);plt.ylim([-1,1])
         #if kk>2: plt.gca().set_yticklabels([])
-        
         plt.title(titles[kk-2])
         xn=xn.flatten()[np.array(v)]
         res.append(xn)
         #xn=median(xn,1)
-        m=np.nansum(xn)/(xn.size-1)
+        m=np.median(xn)
+        plt.plot([m,m],[-1,1],'--g',color='gray',label='_nolegend_',zorder=-2)
         sse=std(xn,bias=True)/xn.size**0.5
         er= sse* stats.t.ppf(0.95,xn.size)
-        
-        plt.gca().add_patch(plt.Rectangle([m-er,-5],2*er,10,
+        er=[sap(xn,25),sap(xn,75)]
+        plt.gca().add_patch(plt.Rectangle([er[0],-5],er[1]-er[0],10,
                                 color='k',zorder=-2,alpha=0.1))
-        print titles[kk-2]+" %.3f CI [%.3f, %.3f]"%(m,m-er,m+er)
+        print titles[kk-2]+" %.3f CI [%.3f, %.3f]"%(m,er[0],er[1])
         if kk==2:
             plt.legend(bbox_to_anchor=(0,0,1,1),loc=2,mode="expand",ncol=seln.sum()/2+1,
                 bbox_transform=plt.gcf().transFigure,frameon=False)
         if exp==2:
             x0=(1-3**0.5/2)*AR
             for i in range(2):
-                plt.plot([x0,x0],[-1,1],'--',color='gray')
+                plt.plot([x0,x0],[-1,1],':',color='gray')
     plt.savefig(FIGPATH+'e%db5%s.png'%(exp,suffix),dpi=400,bbox_inches='tight', pad_inches=0.1)
+
 
 def plotB3(B3,clrs=None,exp=1):
     #plt.figure(figsize=(6,12))
