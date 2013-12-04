@@ -2,18 +2,27 @@ import numpy as np
 import pylab as plt
 import pystan
 import prettyplotlib as ppl
+import scipy.stats as stats
 from scipy.stats import nanmean as mean
+from scipy.stats import nanmedian as median
 from scipy.stats import nanstd as std
 from scipy.stats import scoreatpercentile as sap
-from matusplotlib.plottingroutines import getColors,errorbar
+from matusplotlib.plottingroutines import *
+import matplotlib as mpl
+mpl.rcParams['xtick.labelsize'] = 8
+mpl.rcParams['ytick.labelsize'] = 8
+mpl.rcParams['axes.titlesize'] = 12
+mpl.rcParams['axes.labelsize'] = 10
+mpl.rcParams['axes.linewidth'] = 1
+mpl.rcParams['savefig.dpi']=300
+mpl.rcParams['savefig.extension']='png'
 #some constants and settings
 TRAJPATH='/home/matus/Desktop/research/wolfpackRevisited/trajData/'
 BEHDPATH='/home/matus/Desktop/research/wolfpackRevisited/behData/'
 FIGPATH='/home/matus/Desktop/research/wolfpackRevisited/paper/fig/'
-#TRAJPATH='../trajData/'
-#BEHDPATH='../behData/'
+
 X=0;Y=1;M=0;P=1;W=2
-man=[-0.15,-0.05,0.05,0.1,0.15,0.2,0.25,0.3]
+man=[-0.15,-0.05,0.05,0.1,0.15,0.2,0.25,0.3,-0.2,-0.4,0.4]
 quadMaps=[[1,1,0,0],[0,0,1,1],[0,1,0,1],[1,0,1,0],[1,0,0,1],[0,1,1,0]]
 T=42 # number of trials
 TDUR=17.0 # trial duration in seconds
@@ -21,14 +30,18 @@ CHR=0.3 # radius of the green circle in deg
 AR=0.95 # radius of distractor circles in deg
 MAXD=4 # maximum accepted displacement magnitude in judgment task
 MONHZ=75 # monitor frame rate in hz
+FIGCOL=[3.27,4.86,6.83] # width of figure for a 1,1.5 and 2 column layout of plosone article
+CoM=(1-3**0.5/2)*AR # shift of the origin due tocenter of mass (dart) 
+plt.close('all')
+plt.ion()
 
-def drawCircularAgent(pos,scale=1,eyes=True,ori=0,bcgclr=True):
-    ax=plt.gca();rc=0.9;pos=np.array(pos)
-    if bcgclr: ax.set_axis_bgcolor([0.9]*3)
+def drawCircularAgent(pos,scale=1,eyes=True,ori=0,bcgclr=True,rc=[0.9]*3):
+    ax=plt.gca();pos=np.array(pos)
+    if bcgclr: ax.set_axis_bgcolor(rc)
     epos1=np.array([np.cos(0.345+ori), np.sin(0.345+ori)])*0.71*scale
     epos2=np.array([np.cos(-0.345+ori), np.sin(-0.345+ori)])*0.71*scale
     c=plt.Circle(pos,AR*scale,fc='white',fill=True,
-            ec=[0.9]*3,zorder=-3,clip_on=False)
+            ec=rc,zorder=-3,clip_on=False)
     e1=plt.Circle(epos1+pos,0.19*scale,fc='red',fill=True,
             ec='red',zorder=-2,alpha=0.1,clip_on=False)
     e2=plt.Circle(epos2+pos,0.19*scale,fc='red',fill=True,
@@ -38,16 +51,84 @@ def drawCircularAgent(pos,scale=1,eyes=True,ori=0,bcgclr=True):
         ax.add_patch(e1)
         ax.add_patch(e2)
 
-def drawDartAgent(pos,scale=1,ori=0,bcgclr=True):
-    ax=plt.gca();rc=0.9;pos=np.array(pos)
+def drawDartAgent(pos,scale=1,ori=0,bcgclr=True,eyes=True,rc=[0.9]*3,fill=True):
+    ax=plt.gca();pos=np.array(pos)
     t1=[np.cos(ori),np.sin(ori)]
     t2=[np.cos(ori+2*np.pi/3),np.sin(ori+2*np.pi/3)]
     t3=[np.cos(ori-2*np.pi/3),np.sin(ori-2*np.pi/3)]
     xy=np.array([t1,t2,[0,0],t3])*AR*scale+np.array(pos,ndmin=2)
-    if bcgclr: ax.set_axis_bgcolor([0.9]*3)
-    c=plt.Polygon(xy,fc='white',fill=True,
-            ec=[0.9]*3,zorder=-3,clip_on=False)
+    if bcgclr: ax.set_axis_bgcolor(rc)
+    c=plt.Polygon(xy,fc='white',fill=fill,
+            ec=rc,zorder=-3,clip_on=False)
     ax.add_patch(c)
+
+def loadDataB12(vpn,correct=False):
+    ''' correct undoes the manipulation from block 2'''
+    D=np.zeros((len(vpn),2,T,11))*np.nan
+    for i in range(len(vpn)):
+        vp=vpn[i]
+        B= np.loadtxt(BEHDPATH+'vp%03d.res'%vp)
+        for b in range(2):
+            c=B[B[:,1]==b,:]
+            if c.shape[0]==0:
+                print 'missing: subject %d, block %d'%(vpn[i],b)
+                continue
+            C=np.zeros((T,c.shape[1]))*np.nan
+            C[:c.shape[0],:]=c
+            # gao10 evaluation: compute mean proportion of time spent in wolfpack quadrants
+            for t in range(c.shape[0]):
+                ms=np.load(TRAJPATH+'vp%03d/'%vp+
+                    'chsVp%03db%dtrial%03d.npy'%(vp,C[t,1],C[t,2]))
+                qmap=quadMaps[int(C[t,4])]
+                D[i,b,t,0]=np.logical_and(ms[:,X]>0, ms[:,Y]>0).mean()*qmap[0]
+                D[i,b,t,0]+=np.logical_and(ms[:,X]<=0, ms[:,Y]>0).mean()*qmap[1]
+                D[i,b,t,0]+=np.logical_and(ms[:,X]>0, ms[:,Y]<=0).mean()*qmap[2]
+                D[i,b,t,0]+=np.logical_and(ms[:,X]<=0, ms[:,Y]<=0).mean()*qmap[3]
+                D[i,b,t,0]=1-D[i,b,t,0]
+                assert (qmap[int(C[t,6])/3]==0)==(C[t,-1]==1)
+                D[i,b,t,1]=np.sqrt(np.power(np.diff(ms,axis=0),2).sum(1)).sum(0)/TDUR
+            D[i,b,:,2]=C[:,-1]        
+            # memory displacement
+            posA=np.zeros((T,2))*np.nan # distractor position
+            phiA=np.zeros(T)*np.nan # distractor direction
+            posC=np.zeros((T,2))*np.nan # green circle position
+            for t in range(c.shape[0]):
+                D[i,b,t,3]=0
+                fname='vp300trial%03d.npy' % C[t,3]
+                traj=np.load(TRAJPATH+'vp300/'+fname)
+                posA[t,:]=traj[-1,C[t,6],:2]
+                phiA[t]=(traj[-1,C[t,6],2]-180)/180.0*np.pi
+                
+                ms=np.load(TRAJPATH+'vp%03d/'%vp+
+                    'chsVp%03db%dtrial%03d.npy'%(vp,C[t,1],C[t,2]))
+                posC[t,:]=ms[-1,:]
+                for a in range(12):
+                    D[i,b,t,3]+=(np.sqrt(np.power(traj[:,a,:2]-ms,
+                                2).sum(1))<AR+CHR).mean()
+            phiRM=C[:,7]# nose orientation
+            if correct and np.any(C[:,5]!=0): # undo the manipulation
+                corr= np.array([np.cos(phiRM)*C[:,5],np.sin(phiRM)*C[:,5]])
+                posA+= corr.T
+            phiC=np.arctan2(posC[:,Y]-posA[:,Y],posC[:,X]-posA[:,X]) # mouse ori
+            d=C[:,[8,9]]-posA
+            phiD= np.arctan2(d[:,Y],d[:,X]) # judgment displacement ori
+            dist=np.sqrt(np.power(d,2).sum(1)) # judgment displacement magnitude
+            sel=np.sqrt(np.power(posC-C[:,[8,9]],2).sum(1))>CHR
+            sel=np.logical_and(dist<MAXD,sel)               
+            D[i,b,:,4]=sel
+            D[i,b,:,5]=dist
+            D[i,b,:,6]=phiD
+            D[i,b,:,7]=phiA 
+            D[i,b,:,8]=phiC 
+            D[i,b,:,9]=phiRM
+            D[i,b,:,10]=C[:,5]
+            # for latter estimation we remove zeros and ones
+            owt=D[:,:,:,0]
+            owt[owt>0.999]=0.999
+            owt[owt<0.001]=0.001
+            # note, now we have changed the values in D
+    return D
+
 
 def loadDataB345(vpn,robust=False,correct=False):
     N=len(vpn);
@@ -94,68 +175,185 @@ def loadDataB345(vpn,robust=False,correct=False):
     B4=B3[:,:,~hasEyes]
     B3=B3[:,:,hasEyes]
     return B3,B4,B5
-#vpn=range(351,369)
-#B3,B4,B5=loadDataB345(vpn,correct=True)
 
-def plotB5(B5,vpn,clrs=None,exp=1):
-    titles=['Recalled Position','Selected Position','Selected Position']
-    posx=np.array([-6,-3,0,3,6,-6,-3,0],ndmin=2)
-    seln=~np.isnan(B5[:,0,0])
-    a=np.zeros(B5.shape[1]); a[:5]=1
-    b=np.zeros(B5.shape[1]);
-    if exp==1: b[5:10]=1
-    else: b[5:]=1
-    c=np.zeros(B5.shape[1]); c[10:]=1
-    sels=[a==1,b==1];kk=1
-    plt.figure(figsize=(len(sels)*4,5))
-    if exp==1: sels.append(c==1)
-    if clrs is None: clrs=getColors(B5.shape[0])
-    for sel in sels:
-        objs=[]
-        v=[]
-        plt.subplot(1,len(sels),kk);kk+=1
-        if exp==1: drawCircularAgent(pos=(0,0),eyes=kk<4)
-        else: drawDartAgent(pos=(0,0))
-        plt.plot([-1,1],[0,0],'gray',label='_nolegend_');
-        plt.plot([0,0],[-1,1],'gray',label='_nolegend_')
-        dx=B5[:,sel,1]-posx[0,:sel.sum()]
-        dy=B5[:,sel,2]
-        mag=np.sqrt(np.power(dx,2)+np.power(dy,2))
-        if exp==1: phi=np.arctan2(dy,dx)-B5[:,sel,0]
-        else:  phi=np.arctan2(dy,dx)-np.pi*B5[:,sel,0]/180
-        xn=np.cos(phi)*mag
-        yn=np.sin(phi)*mag
-        for i in range(B5.shape[0]):
-            ppl.scatter(plt.gca(),xn[i,:],yn[i,:],color=clrs[i],label='_nolegend_')
-            valid=np.sqrt(np.power(xn[i,:],2)+np.power(yn[i,:],2))<1
-            v.extend(valid.tolist())
-            if seln[i]: label=str(vpn[i])
-            else:
-                print vpn[i]
-                label='_nolegend_'
-            plt.plot(np.median(xn[i,valid]),np.median(yn[i,valid]),'x',
-                          label=label,mec=clrs[i],mew=2,ms=8)
-        plt.gca().set_aspect('equal')
-        plt.xlim([-1,1]);plt.ylim([-1,1])
-        #if kk>2: plt.gca().set_yticklabels([])
+def plotB1(D,exp=1):
+    if exp==1: drawAgent=drawCircularAgent
+    else: drawAgent=drawDartAgent
+    clrs=getColors(D.shape[0])
+    plt.figure(figsize=(FIGCOL[1],0.9*FIGCOL[1]))
+    titles=['Raw Displacement','Representational Momentum',
+           'Lazy Hand Gravity','Orientation']
+    spid=[1,3,6,4]
+    for i in range(D.shape[0]):
+        k=0
+        for phiK in [0,D[i,0,:,7],D[i,0,:,8],D[i,0,:,9]]:
+            ax=plt.subplot(2,2,k+1)#,3,spid[k])
+                         
+            phi=D[i,0,:,6]-phiK
+            x=np.cos(phi)*D[i,0,:,5]
+            y=np.sin(phi)*D[i,0,:,5]
+            #plot perpendicular
+            sel=np.logical_and(D[i,0,:,4],D[i,0,:,2]==0)
+            ppl.scatter(ax,x[sel],y[sel],color=clrs[i])
+            # plot wolves
+            sel=np.logical_and(D[i,0,:,4],D[i,0,:,2]==1)
+            ppl.scatter(ax,x[sel],y[sel],color=clrs[i])
+            # display medians
+            plt.plot(np.median(x[D[i,0,:,4]==1]),
+                     np.median(y[D[i,0,:,4]==1]),
+                     'x',mec=clrs[i],mew=1.5,ms=7)
+            #plt.xlabel('x axis');plt.ylabel('y axis')
+            plt.xlim([-2,2]);plt.ylim([-2,2])
+            plt.title(titles[k])
+            plt.plot([-10,10],[0,0],color='gray')
+            plt.plot([0,0],[-10,10],color='gray')
+            if k<2: ax.set_xticklabels([])
+            if k%2==1: ax.set_yticklabels([]) 
+            ax.set_aspect('equal')
+            if k==3: drawAgent((2.5,0),scale=0.4,bcgclr=False)
+            elif k==1:
+                drawAgent((2.5,0),scale=0.4,bcgclr=False,eyes=False)
+                drawAgent((2.55,0),scale=0.4,bcgclr=False,eyes=False)
+                drawAgent((2.6,0),scale=0.4,bcgclr=False,eyes=False)
+                drawAgent((2.65,0),scale=0.4,bcgclr=False,eyes=False)
+            elif k==2:
+                ax.add_patch(plt.Circle((2.3,0),radius=0.6*CHR,fc='g',alpha=0.2,clip_on=False))
+            k+=1
+            if i==0: plt.text(-1.8,1.6,str(unichr(65+k-1)),fontdict={'weight':'bold'},fontsize=12);
+    plt.subplots_adjust(left=0.07,bottom=0.05,top=0.95,hspace=0.12)
+def plotB2reg():
+    plt.figure(figsize=(FIGCOL[0],1.05*FIGCOL[0]))
+    w=loadStanFit('E2B2LregCa.fit')
+    px=np.array(np.linspace(-0.5,0.5,101),ndmin=2)
+    d=w['a4']
+    a1=np.array(w['ma'][:,4],ndmin=2).T+1
+    a0=np.array(w['ma'][:,3],ndmin=2).T
+    printCI(w,'ma')
+    y=np.concatenate([sap(a0+a1*px,97.5),sap(a0+a1*px[:,::-1],2.5)])
+    x=np.squeeze(np.concatenate([px,px[:,::-1]],axis=1))
+    man=np.array([-0.4,-0.2,0,0.2,0.4])
+    plt.plot(px[0,:],np.median(a0)+np.median(a1)*px[0,:],'red')
+    #plt.plot([-1,1],[0.5,0.5],'grey')
+    ax=plt.gca()
+    ax.set_aspect(1)
+    ax.add_patch(plt.Polygon(np.array([x,y]).T,alpha=0.2,fill=True,fc='red',ec='w'))
+    y=np.concatenate([sap(a0+a1*px,75),sap(a0+a1*px[:,::-1],25)])
+    ax.add_patch(plt.Polygon(np.array([x,y]).T,alpha=0.2,fill=True,fc='red',ec='w'))
+    mus=[]
+    for m in range(len(man)):
+        mus.append(loadStanFit('E2B2LHC%d.fit'%m)['ma4']+man[m])
+    mus=np.array(mus).T
+    errorbar(mus,x=man-1,xaxis=False)
+    ax.set_xticks(man)
+    plt.grid(color=[0.9]*3,visible=True,lw=0.5,ls='-',axis='x')
+    plt.xlim([-0.5,0.5])
+    plt.ylim([-0.5,0.7])
+    plt.xlabel('Manipulated Displacement')
+    plt.ylabel('Perceived Displacemet')
+def plotB5(B5s,vpns,clrs=None,exps=[1],suffix=''):
+    plt.figure(figsize=[FIGCOL[2]]*2);tt=0
+    for gg in range(len(B5s)):
+        B5=B5s[gg]; exp=exps[gg];vpn=vpns[gg]
         
-        plt.title(titles[kk-2])
-        xn=xn.flatten()[np.array(v)]
-        print titles[kk-2]+" %.3f CI [%.3f, %.3f]"%(mean(xn), mean(xn)-std(xn)*1.96/xn.size**0.5, mean(xn)+std(xn)*1.96/xn.size**0.5)
-        if kk==2:
-            plt.legend(bbox_to_anchor=(0,0,1,1),loc=2,mode="expand",ncol=seln.sum()/2+1,
-                bbox_transform=plt.gcf().transFigure,frameon=False)
-    plt.savefig(FIGPATH+'e%db5.png'%exp,dpi=400,bbox_inches='tight', pad_inches=0.1)
-
-
+        titles=['Recalled Position','Selected Position','Selected Position']
+        posx=np.array([-6,-3,0,3,6,-6,-3,0],ndmin=2)
+        seln=~np.isnan(B5[:,0,0])
+        a=np.zeros(B5.shape[1]); a[:5]=1
+        b=np.zeros(B5.shape[1]);
+        if exp==1: b[5:10]=1
+        else: b[5:]=1
+        c=np.zeros(B5.shape[1]); c[10:]=1
+        sels=[a==1,b==1];kk=1
+        if exp==1: sels.append(c==1)
+        if clrs is None or len(clrs)!=B5.shape[0]: clrs=getColors(B5.shape[0])
+        #if gg==1: clrs=getColors(28)[:18]
+        #elif gg==2: clrs=getColors(28)[18:]
+        res=[]
+        for sel in sels:
+            objs=[]
+            v=[]
+            plt.subplot(len(B5s),3,gg*3+kk);kk+=1
+            if exp==1: drawCircularAgent(pos=(0,0),eyes=kk<4)
+            else: drawDartAgent(pos=(0,0))
+            plt.plot([-1,1],[0,0],'gray',label='_nolegend_');
+            plt.plot([0,0],[-1,1],'gray',label='_nolegend_')
+            dx=B5[:,sel,1]-posx[0,:sel.sum()]
+            dy=B5[:,sel,2]
+            mag=np.sqrt(np.power(dx,2)+np.power(dy,2))
+            if exp==1: phi=np.arctan2(dy,dx)-B5[:,sel,0]
+            else:  phi=np.arctan2(dy,dx)-np.pi*B5[:,sel,0]/180
+            xn=np.cos(phi)*mag
+            yn=np.sin(phi)*mag
+            for i in range(B5.shape[0]):
+                ppl.scatter(plt.gca(),xn[i,:],yn[i,:],color=clrs[i],label='_nolegend_')
+                valid=np.sqrt(np.power(xn[i,:],2)+np.power(yn[i,:],2))<1.2
+                v.extend(valid.tolist())
+                if seln[i]: label=str(vpn[i])
+                else:label='_nolegend_'
+                plt.plot(np.median(xn[i,valid]),np.median(yn[i,valid]),'x',
+                              label=label,mec=clrs[i],mew=2,ms=8)
+                xn[i,~valid]=np.nan
+            plt.gca().set_aspect('equal')
+            plt.xlim([-1,1]);plt.ylim([-1,1])
+            #if kk>2: plt.gca().set_yticklabels([])
+            if gg==0: plt.title(titles[kk-2],fontsize=12)
+            #print np.array(v).sum(),float(seln.sum()), len(v)/float(xn.shape[0])
+            xn=xn.flatten()[np.array(v)]
+            
+            #if gg==1: xxn=np.copy(xn)
+            #elif gg==2: xn=np.concatenate([xxn,xn])
+            res.append(xn)
+            #xn=median(xn,1)
+            m=np.mean(xn)
+            plt.text(-0.9,0.8,str(unichr(65+tt)),fontdict={'weight':'bold'},fontsize=12);tt+=1
+            plt.plot([m,m],[-1,1],'--g',color='gray',label='_nolegend_',zorder=-2)
+            sse=std(xn,bias=True)/xn.size**0.5
+            er= sse* stats.t.ppf(0.95,xn.size)
+            er=[m-2*er,m+2*er]#[sap(xn,25),sap(xn,75)]
+            plt.gca().add_patch(plt.Rectangle([er[0],-5],er[1]-er[0],10,
+                                    color='k',zorder=-2,alpha=0.1))
+            print " %.3f CI [%.3f, %.3f]"%(m,er[0],er[1])
+            if False:#kk==2:
+                plt.legend(bbox_to_anchor=(0,0,1,1),loc=2,mode="expand",ncol=seln.sum()/2+1,
+                    bbox_transform=plt.gcf().transFigure,frameon=False)
+            if exp==2:
+                x0=(1-3**0.5/2)*AR
+                print x0
+                for i in range(2):
+                    plt.plot([x0,x0],[-1,1],':',color='gray')
+def plotB2Wreg():
+    plt.figure(figsize=(FIGCOL[0],0.8*FIGCOL[0]))
+    w=loadStanFit('E2B2Wreg.fit')
+    a1=np.array(w['ma1'],ndmin=2).T
+    a0=np.array(w['ma0'],ndmin=2).T
+    px=np.array(np.linspace(-0.5,0.5,101),ndmin=2)
+    printCI(w,'ma0');printCI(w,'ma1')
+    y=np.concatenate([sap(a0+a1*px,97.5),sap(a0+a1*px[:,::-1],2.5)])
+    x=np.squeeze(np.concatenate([px,px[:,::-1]],axis=1))
+    plt.plot(px[0,:],np.median(a0)+np.median(a1)*px[0,:],'red')
+    #plt.plot([-1,1],[0.5,0.5],'grey')
+    ax=plt.gca()
+    ax.add_patch(plt.Polygon(np.array([x,y]).T,alpha=0.2,fill=True,fc='red',ec='red'))
+    y=np.concatenate([sap(a0+a1*px,75),sap(a0+a1*px[:,::-1],25)])
+    ax.add_patch(plt.Polygon(np.array([x,y]).T,alpha=0.2,fill=True,fc='red',ec='red'))
+    mus=[];man=np.array([-0.4,-0.2,0,0.2,0.4])
+    for m in range(len(man)):
+        mus.append(loadStanFit('E2B2WBB%d.fit'%m)['mmu'])
+    mus=np.array(mus).T
+    errorbar(mus,x=man-1,xaxis=False)
+    ax.set_xticks(man)
+    plt.xlim([-0.5,0.5])
+    plt.ylim([0.4,0.56])
+    plt.xlabel('Manipulated Displacement')
+    plt.ylabel('Prop. of Time in Wolfpack Quadrants')
 def plotB3(B3,clrs=None,exp=1):
     #plt.figure(figsize=(6,12))
     if clrs is None: clrs=getColors(B3.shape[0])
     if exp==1: drawAgent=drawCircularAgent
     else: drawAgent=drawDartAgent
     for i in range(B3.shape[0]):
-        drawAgent((-2.2,0),bcgclr=False,scale=0.4)
-        drawAgent((2,0),bcgclr=False,scale=0.4,ori=-np.pi/2)
+        drawAgent((-2.3,0),bcgclr=False,scale=0.4)
+        drawAgent((2,0),bcgclr=False,scale=0.4,ori=[-np.pi/2,np.pi/2][exp-1])
         plt.plot([-1.5,1.5],[0,0],'gray'); plt.plot([0,0],[-1.5,1.5],'gray')
         ppl.scatter(plt.gca(),B3[i,X,:],B3[i,Y,:],color=clrs[i])
         plt.plot(np.median(B3[i,X,:]),np.median(B3[i,Y,:]),'x',mec=clrs[i],mew=2,ms=8)
@@ -164,8 +362,46 @@ def plotB3(B3,clrs=None,exp=1):
         ax=plt.gca()
         ax.set_clip_on(False)
         ax.set_aspect('equal')
-        plt.title('Displacement in Degrees')
-    plt.savefig(FIGPATH+'e1b3.png',dpi=400, pad_inches=0.1)
+        #plt.title('Displacement in Degrees')
+def plotB3reg():
+    w=loadStanFit('E2B3BHreg.fit')
+    printCI(w,'mmu')
+    printCI(w,'mr')
+
+    plt.figure(figsize=(FIGCOL[1],FIGCOL[0]))
+    for b in range(2):
+        plt.subplot(1,2,b+1)
+        plt.title('')
+        px=np.array(np.linspace(-0.5,0.5,101),ndmin=2)
+        a0=np.array(w['mmu'][:,b],ndmin=2).T
+        a1=np.array(w['mr'][:,b],ndmin=2).T
+        
+        y=np.concatenate([sap(a0+a1*px,97.5),sap(a0+a1*px[:,::-1],2.5)])
+        x=np.squeeze(np.concatenate([px,px[:,::-1]],axis=1))
+        plt.plot(px[0,:],np.median(a0)+np.median(a1)*px[0,:],'red')
+        #plt.plot([-1,1],[0.5,0.5],'grey')
+        ax=plt.gca()
+        ax.set_aspect(1)
+        ax.add_patch(plt.Polygon(np.array([x,y]).T,alpha=0.2,fill=True,fc='red',ec='w'))
+        y=np.concatenate([sap(a0+a1*px,75),sap(a0+a1*px[:,::-1],25)])
+        ax.add_patch(plt.Polygon(np.array([x,y]).T,alpha=0.2,fill=True,fc='red',ec='w'))
+        man=np.array([-0.4,-0.2,0,0.2,0.4])
+        mus=[]
+        for m in range(len(man)):
+            mus.append(loadStanFit('E2B3BH%d.fit'%m)['mmu'][:,b])
+        mus=np.array(mus).T
+        errorbar(mus,x=man-1,xaxis=False)
+        ax.set_xticks(man)
+        plt.grid(color=[0.9]*3,visible=True,lw=0.5,ls='-',axis='x')
+        plt.xlim([-0.5,0.5])
+        plt.ylim([-0.4,0.8])
+        plt.text(-0.4,0.65,['A','B'][b],fontdict={'weight':'bold'},fontsize=12);
+        #plt.xlabel('Manipulated Displacement')
+        if b==0:
+            plt.ylabel('Perceived Displacemet')
+            plt.gca().set_yticklabels([])
+    plt.text(-1.1,-0.6,'Manipulated Displacement',fontsize=10);
+
 def plotB3fit(fit,suffix='',pars=['mu','mmu']):
     plt.figure(figsize=(6,3))
     D=fit.extract()[pars[0]]
@@ -201,3 +437,87 @@ def plotB4(B4,clrs=None,exp=1):
             else: plt.ylabel('x axis displacement')
     plt.savefig(FIGPATH+'e1b4.png',dpi=400,bbox_inches='tight', pad_inches=0.1)
 
+def plotVectors():
+    plt.figure(figsize=[FIGCOL[0]]*2)
+    ax=plt.gca()
+    ax.set_aspect('equal')
+    ax.set_axis_off()
+    plt.plot([-10,10],[0,0],color='gray',zorder=-3)
+    plt.plot([0,0],[-10,10],color='gray',zorder=-3)
+    plt.xlim([-1.5,2]);plt.ylim([-1.5,2])
+    #drawCircularAgent((-0.2,0),eyes=False)
+    ax.add_patch(plt.Circle((-0.2,0),radius=AR,ec=[0.94]*3,zorder=-3))
+    ax.add_patch(plt.Circle((-0.4,0),radius=AR,ec=[0.96]*3,zorder=-3))
+    ax.add_patch(plt.Circle((-0.6,0),radius=AR,ec=[0.98]*3,zorder=-3))
+    drawCircularAgent((0,0),ori=np.arctan2(1,1.5)-np.pi/2)
+    ax.add_patch(plt.Circle((1.5,1),radius=CHR,fc='g',alpha=0.2))
+    plt.arrow(0.3,0.2,0.36,0,head_width=0.08,lw=2,color='b',alpha=0.2,length_includes_head=True)
+    plt.arrow(0.66,0.2,0,-0.36,head_width=0.08,lw=2,color='k',alpha=0.2,length_includes_head=True)
+    plt.arrow(0.66,-0.16,0.2,-0.3,head_width=0.08,lw=2,color='r',alpha=0.2,length_includes_head=True)
+    plt.arrow(0,0,0.3,0.2,head_width=0.08,lw=2,color='g',length_includes_head=True)
+    plt.arrow(0,0,0.2,-0.3,head_width=0.08,lw=2,color='r',length_includes_head=True)
+    plt.arrow(0,0,0.36,0,head_width=0.08,lw=2,color='b',length_includes_head=True)
+    plt.arrow(0,0,0,-0.36,head_width=0.08,lw=2,color='k',length_includes_head=True)
+
+    plt.plot([0.86],[-0.46],'+k',ms=16,mew=2)
+def plotManipulation():
+    plt.figure(figsize=[FIGCOL[0]]*2)
+    man=[[-0.15,-0.05,0.05,0.1,0.15,0.2],[0.05, 0.1, 0.15, 0.2, 0.25, 0.3]]
+    man=[[-0.4,-0.2],[0.2,0.4]]
+    drawDartAgent((0,0),ori=-np.pi)
+    plt.xlim([-1,1]);plt.ylim([-1,1])
+    plt.gca().set_aspect('equal')
+    plt.plot([-1,1],[0,0],color='gray',zorder=-3)
+    plt.plot([0,0],[-1,1],color='gray',zorder=-3)
+    plt.plot(man[0],[0]*2,'ok')
+    plt.plot(man[1],[0]*2,'xk',ms=8)
+    #plt.gca().set_yticks([])
+def plotRotation():
+    plt.figure(figsize=[FIGCOL[0]]*2)
+    ax=plt.gca()
+    ax.set_aspect('equal')
+    plt.plot([0,AR],[0,0],color='b',zorder=-3)
+    plt.plot([0,0],[0,AR],color='r',zorder=-3)
+    plt.xlim([-1,1]);plt.ylim([-1,1])
+    drawDartAgent((0,0),ori=np.pi/2,bcgclr=False,rc='r',fill=False)
+    drawDartAgent((0,0),ori=0,bcgclr=False,rc='b',fill=False)
+    w= mpl.patches.Wedge((0,0),CoM,0,90,ec=None,fc='gray',fill=True,alpha=0.2)
+    ax.add_patch(w)
+    plt.plot([0],[0],'go',ms=8)
+    plt.plot([0],[CoM],'rx',ms=8,mew=2)
+    plt.plot([CoM],[0],'bx',ms=8,mew=2)
+
+##vpna=range(301,314)
+##B3a,B4,B5a=loadDataB345(vpna)
+##vpnb=range(351,381); vpnb.remove(369); vpnb.remove(370)
+##B3b,B4,B5b=loadDataB345(vpnb)
+##
+##temp=[B5a,B5b[:18,:,:],B5b[18:,:,:]]
+##plotB5(temp,[vpna,vpnb[:18],vpnb[18:]],exps=[1,2,2])
+##plt.savefig(FIGPATH+'b5',bbox_inches='tight', pad_inches=0.1)
+##
+##plt.figure(figsize=[FIGCOL[0],FIGCOL[0]*1.4])
+##plt.subplot(2,1,1)
+##plotB3(B3a)
+##plt.text(-1.4,1.2,'A',fontdict={'weight':'bold'},fontsize=12);
+##plt.subplot(2,1,2)
+##plotB3(B3b,exp=2)
+##plt.text(-1.4,1.2,'B',fontdict={'weight':'bold'},fontsize=12);
+##plt.subplots_adjust(top=0.95,bottom=0.05)
+##plt.savefig(FIGPATH+'b3')
+##plotB3reg()
+##plt.savefig(FIGPATH+'b3reg',bbox_inches='tight', pad_inches=0.1)
+##
+##D=loadDataB12(vpna)
+##plotB1(D)
+##plt.savefig(FIGPATH+'b1')
+##plotB2reg()
+##plt.savefig(FIGPATH+'b2reg',bbox_inches='tight', pad_inches=0.1)
+##plotVectors()
+##plt.savefig(FIGPATH+'vectors',bbox_inches='tight', pad_inches=0.1)
+##plotManipulation()
+##plt.savefig(FIGPATH+'man',bbox_inches='tight', pad_inches=0.1)
+##plotB2Wreg()
+##plt.savefig(FIGPATH+'lmaReg',bbox_inches='tight', pad_inches=0.1)
+##plotRotation()
+##plt.savefig(FIGPATH+'rot',bbox_inches='tight', pad_inches=0.1)
