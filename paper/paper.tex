@@ -1,73 +1,159 @@
-\documentclass{article}
-\usepackage{graphicx}
-\usepackage{natbib}
+% Template for PLoS
+% Version 1.0 January 2009
+%
+% To compile to pdf, run:
+% latex plos.template
+% bibtex plos.template
+% latex plos.template
+% latex plos.template
+% dvipdf plos.template
+
+\documentclass[10pt]{article}
+
+% amsmath package, useful for mathematical formulas
 \usepackage{amsmath}
+% amssymb package, useful for mathematical symbols
+\usepackage{amssymb}
+
+% graphicx package, useful for including eps and pdf graphics
+% include graphics with the command \includegraphics
+\usepackage{graphicx}
+
+% cite package, to clean up citations in the main text. Do not remove.
+\usepackage{cite}
+
+\usepackage{color} 
+
+% Use doublespacing - comment out for single spacing
+%\usepackage{setspace} 
+%\doublespacing
+
+
+% Text layout
+\topmargin 0.0cm
+\oddsidemargin 0.5cm
+\evensidemargin 0.5cm
+\textwidth 16cm 
+\textheight 21cm
+
+% Bold the 'Figure #' in the caption and separate it with a period
+% Captions will be left justified
+\usepackage[labelfont=bf,labelsep=period,justification=raggedright]{caption}
+
+% Use the PLoS provided bibtex style
+\bibliographystyle{plos2009}
+
+% Remove brackets from numbering in List of References
+\makeatletter
+\renewcommand{\@biblabel}[1]{\quad#1.}
+\makeatother
+
+
+% Leave date blank
+\date{}
+
+\pagestyle{myheadings}
+%% ** EDIT HERE **
+
+%% ** EDIT HERE **
+%% PLEASE INCLUDE ALL MACROS BELOW
+\usepackage{hyperref}
+%% END MACROS SECTION
 
 \begin{document}
-\section{Introduction}
+
+% Title must be 150 characters or less
+\begin{flushleft}
+{\Large
+\textbf{Perceived Displacement explains Wolfpack Effect}
+}
+% Insert Author names, affiliations and corresponding author email.
+\\
+Matus Simkovic $^{1\ast}$, 
+Birgit Tr\"auble $^{1}$
+\\
+\bf{1}  Universit\"at Heidelberg, Germany
+\\
+$\ast$ E-mail: matus.simkovic@psychologie.uni-heidelberg.de
+\end{flushleft}
+
+% Please keep the abstract between 250 and 300 words
+\section*{Abstract}
+
+% Please keep the Author Summary between 150 and 200 words
+% Use first person. PLoS ONE authors please skip this step. 
+% Author Summary not valid for PLoS ONE submissions.   
+\section*{Author Summary}
+
+\section*{Introduction}
 %ms ich würde hier gleich zum Punkt kommen
-Recently, Gao and Scholl presented a set of studies \citep{gao09,gao10,gao11} demonstrating that certain aspects of motion influence the detection of chasing and performance in interactive tasks where subjects controlled chasee with mouse. 
-In \citet{gao10} the authors focused on the contribution of agent's orientation. 
+Recently, Gao and Scholl presented a set of studies \cite{gao09,gao10,gao11} demonstrating that certain aspects of motion influence the detection of chasing and the performance in interactive tasks where subjects control chasee with computer mouse. 
+In \cite{gao10} the authors focused on the contribution of agent's orientation. 
 They found that visual scenarios where multiple moving geometrical shapes were oriented towards a common target (prey) were more difficult than control conditions where agents' orientation was shifted by 90 degrees. 
-For example, in Experiment 2 the subjects controlled a green disc with computer mouse and tried to avoid contact with a white circle which chased the green circle. 
+For example, in Experiment 2 the subjects controlled a green disc with mouse and tried to avoid contact with a white circle which chased the green circle. 
 The display included six other randomly moving white circles which served as distractors and made the task difficult. 
-As a manipulation the authors added seven white darts that were in half of the trials oriented towards the green circle and in other half perpendicular to it. 
+As a manipulation the authors added seven white darts that were, in half of the trials, oriented towards the green circle and in other half perpendicular to it. 
 %ms hier vielleicht ein Bild das zeigt wie man die Ausrichtung manipuliert? 
-They compared across the two conditions the proportion of trials where chaser caught the green circle (relative to trials where he didn't). 
+They compared the two conditions in terms of the proportion of trials where chaser caught the green circle. 
 Even though the subjects were explicitly told to ignore the darts, they were worse at escape in trials where the darts pointed toward green circle. 
-In Experiment 4 the chaser was the only circle in the display, so it was easily identified. 
-However the subjects needed to additionaly avoid contact with darts. 
-Escape rate was lower in trials where the darts were oriented towards green circle than in trials where the orientation was perpendicular. 
+In their Experiment 4 the chaser was the only circle in the display, so it was easily identified. 
+However the subjects were additionaly required to avoid contact with darts. 
+Escape rate was lower in trials where the darts were oriented towards green circle in comparison to trials where the orientation was perpendicular. 
 In Experiment 3a the comparison was not between trials, but rather the display was divided into areas which contained darts with different orientation. 
 Subjects' task was to avoid contact with agents. 
 Authors found that in doing so the subjects spent more time in areas with darts oriented perpendicular to the green circle than in areas where darts pointed directly towards it.
-The authors named the consistent influence of orientation, the wolfpack effect.\\
+The authors called the consistent distressing influence of head-on orientation on subject's performance, the wolfpack effect.\\
 If we want to conclude that the mentioned effects are due to orientation, one additional assumption is crucial. 
 The experimentally manipulated orientation change has to be perceived as an orientation change and not as displacement. 
-This is illustrated in figure \ref{fig.dart} on the example of darts used by \citet{gao10}. 
-The authors designated the concave vertex (red) as the nominal point for rotation. 
-Intuitively however, the center of mass (blue) looks like a much better choice. 
-What happens if the perceived center of rotation is displaced in the direction of center of mass.
-In this case the rotation around the nominal center is perceived as motion towards chasee and we can contrive an alternative explanation for the results in \citet{gao10}. 
-In Experiment 3a the subjects avoided areas with darts oriented towards the prey because the agents' positions were perceived as shifting closer to the green circle. 
-In Experiment 4 if we assume that subjects estimated the critical distance to surrounding agents and based their decisions where to move the green circle on this estimate. 
-If the perceived agents' location was shifted towards chasee in wolfpack trials, the subjects would often prematurely leave the current location in exchange for another location which would be a bad choice from the point of view of the nominal dart's center which was used to decide whether the green circle was caught or not (see Figure \ref{fig.exp4}). 
+This is illustrated in figure \ref{fig:rot} on the example of darts used by \cite{gao10}. 
+The authors designated the concave vertex (green dot) as the nominal point for rotation. 
+Intuitively however, the center of mass (cross) looks like a much better candidate. 
+What happens if the perceived center of rotation is displaced in the direction of center of mass?
+In this case the rotation around the nominal center is perceived as motion. 
+If the agent orients towards chasee this is perceived as a motion towards chasee. 
+Consequently, we can contrive an alternative explanation for the results in \cite{gao10}. 
+In Experiment 3a the subjects avoided areas with darts oriented towards the prey because they perceived these agents nearer to the green circle. 
+In Experiment 4 we assume that subjects estimated the critical distance to the surrounding agents. 
+Then based on this estimate they decided where to move the green circle next. 
+If the agents' perceived location was shifted towards chasee in wolfpack trials, the subjects would often prematurely leave the current location in exchange for another alternative location. 
+This alternative location however would be a bad choice from the point of view of the dart's nominal center (green dot) whose locatio was used to decide whether the green circle was caught or not. 
 Results of Experiment 3a and 4 can thus be alternatively interpreted in terms of domain general processes such as distance estimation and decision making. 
 It's hard to come up with domain-general explanation for results of Experiment 2 (and 1). 
-Still, since the the intended orientation change is perceived as motion, the results can be explained by the influence of motion cues on subjects judgment.\\
-Experiment 3b in \citet{gao10} was the only experiment that did not use darts. 
-The design and results were similar to that of Experiment 3a, except that instead of darts the subject tried to avoid white circles whose orientation was determined by two red dots ('eyes', see figure \ref{fig.eyes}).
+Still, since the the intended orientation change is perceived as motion, the results can be explained by the influence of motion cues on subjects judgment. 
+If properly manipulated the rotation doesn't need to have any influence at all.\\
+Experiment 3b in \cite{gao10} was the only experiment that did not use darts. 
+The design and results were similar to that of Experiment 3a, except that instead of darts the subject tried to avoid white circles whose orientation was determined by two red dots ('eyes', see e.g. figure \ref{fig:vec}).
 We will refer to these stimuli as bugs. 
-If we use the shape of the agent to determine the center of mass, this is identical to the point around which the circle was rotated. 
+If we use the shape of the agent to determine the center of mass, this is identical to the point around which the circle was rotated in the Experiment. 
 Still, this doesn't mean that the bug's perceived position isn't influenced by the orientation of its eyes.\\
-The literature on memory displacement is relevant here \citep{hubbard05}. 
+The literature on memory displacement is relevant here \cite{hubbard05}. 
 It has been repeatedly demonstrated that if subjects are asked to give the last position of a stimulus that just disappeared from the screen, subject's responses are systematically displaced by factors such as gravity, momentum or shape. 
-Crucially, some studies \citep{freyd92}[e.g.] demonstrated that displacement can also be influenced by information about stimulus animacy. 
-The memory displacement is studied by asking subjects to locate the last position of an object that just disappeared.
-This is usually done by asking subjects to select this position with mouse or alternatively to by selecting which of two probes is nearer to the location where the object disappeared.
-How are such displacements in explicit recall relevant to the implicit interactive tasks used in \citet{gao10}.
-According to \citet{hubbard05}[p. 844] "displacement occurs because it aids in the spatial localization of physical objects and facilitates rapid motor responding to objects in the environment". 
-He further adds (cf.) that "accurate spatial localization is important for calibrating an observer's response to a stimulus so that a maximally effective and adaptive interaction with that stimulus might be achieved". 
+Crucially, some studies (e.g.\cite{freyd92}) demonstrated that displacement can also be influenced by information about stimulus animacy. 
+The memory displacement is studied by asking subjects to report the last position of an object that just disappeared.
+This is usually done by asking subjects to select this position with mouse or alternatively by selecting which of several probes is nearest to the location where the object disappeared.
+How are such displacements in explicit recall relevant to the implicit interactive tasks used in \cite{gao10}?
+According to \cite{hubbard05} (p. 844) ``displacement occurs because it aids in the spatial localization of physical objects and facilitates rapid motor responding to objects in the environment''. 
+He further adds (cf.) that ``accurate spatial localization is important for calibrating an observer's response to a stimulus so that a maximally effective and adaptive interaction with that stimulus might be achieved''. 
 For instance, the displacement due to representational momentum anticipates future position and allows to correct the discrepancy between the position when the action is programmed and when it is performed. 
-We can apply this idea to stimuli and tasks in \citet{gao10}. Since agent's head/nose orientation usually predicts the subsequent motion, orientation may be used to predict future position. 
+We can apply this idea to stimuli and tasks in \cite{gao10}. Since agent's head/nose orientation usually predicts the subsequent motion, orientation may be used to predict future position. 
 In Experiment 3b it is important for the subject to accurately predict the direction of the object's motion. 
-Hence we expect to find memory displacement which is influenced by factors that provide cue to the future motion direction. 
+Hence we would predict a memory displacement which is influenced by factors that provide cue to the future motion direction. 
 Since biological organisms usually move in direction in which their body and eyes are oriented, agent's orientation is a good candidate for such a cue.  
-Due to the perceived displacement the subject would avoid the wolfpack areas because the wolfpack stimuli are perceived as closing in on the green circle.\\
-In the current study we investigate the influence of perceived displacement on subject's performance in the interactive tasks from \citet{gao10}. 
-In particular we chose to revisit their task from Experiment 3, the so-called leave-me-alone task in which subjects avoided contact with randomly moving objects in a display separated into areas with different orientation. 
-We chose this Experiment since it was the only one that demonstrated the wolfpack effect with bug stimuli (displayed in figure \ref{fig.eyes}) where there is no obvious reason for discrepancy between the nominal and perceived object's center (as is the case darts and their shifted center of mass).\\
+Due to the perceived displacement the subject then avoids the wolfpack areas because the wolfpack stimuli are perceived as closing in on the green circle. 
+For similar reasons, we would expect the perceived location of the darts to be shifted even farther towards the nose beyond the position of the center of mass.\\
+In the current study we investigate the influence of perceived displacement on subject's performance in the interactive tasks from \cite{gao10}. 
+In particular we chose to revisit their task from Experiment 3, the so-called Leave-Me-Alone task in which subjects avoided contact with randomly moving objects in a display separated into areas differing in terms of agents' orientation. 
+We chose this Experiment since it was the only one that demonstrated the wolfpack effect with bug stimuli. We use both bugs and darts in separate experiment since these different stimuli provide different cues to displacement.\\
 Our argument can be distilled into two separate claims:
 \begin{enumerate}
   \item The perceived center of the dart and bug stimuli is displaced in direction of it's nose/eyes.
-  \item This displacement influences subjects' performance in the leave-me-alone task. 
+  \item This displacement influences subjects' performance in the Leave-Me-Alone task. 
 In particular, the subjects avoid wolfpack areas because the manipulated orientation in the wolfpack areas is perceived as motion towards chasee.
 \end{enumerate}  
-
-To test the second claim we shift the rotation center along the anteroposterior axis of the agent and measure how this manipulation influences subject's avoidance of wolfpack areas. 
-We utilize two tasks to test the first claim. 
+To test the second claim we shift the rotation center along the anteroposterior axis of the agent and measure how this manipulation influences subject's avoidance of wolfpack areas. We however need to separate the constant influence of the orientation cues from the manipulated displacement. We can use simple circles with no eyes to avoid constant influence. With darts there is no straightforward way to neutralize the constant influence of the shape on the perceived displacement. Instead we use linear regression model to separate the two factors in the analysis.\\
+To test the first claim we utilize two tasks. 
 First, we append a location recall task to the leave-me-alone task. 
-After each trial of leave-me-alone task one dart/bug disappears while all the remaining objects freezee at their last position. 
+Immediately after each trial of the leave-me-alone task one dart/bug disappears while all the remaining objects freezee at their last position. 
 The subject is asked to select the position where the agent disappeared.
 Second, we devised a novel distance bisection task. 
 Subjects are shown the same motion as in the leave-me-alone task. 
@@ -96,10 +182,10 @@ The outline of this report is as follows. %ms kommt wenn ich das fertig habe
 %ms soll ich in der Einfuhrung auch die letzte Aufgabe mit statischen Stimuli erwahnen?
 %ms bezeichnungen agent und object fur die stimuli konnte man vielleicht vereinhaltlichen so das nur eins davon verwendet wird, green circle und chasee werden auch austauchbar verwendet...   
 
-\section{General Methods}
+\section*{General Methods}
 
-\subsection{Stimulus}
-The Stimulus programming followed the description in \citet{gao10} and the examples provided on Brian Scholls web-page. 
+\subsection*{Stimulus}
+The Stimulus programming followed the description in \cite{gao10} and the examples provided on Brian Scholls web-page. 
 The display was divided into four quadrants, each forming a square of size 5.9 degrees. 
 Three white objects (1.9 degrees in diameter) moved inside of each quadrant. 
 These objects were either bugs (Experiment 1) or darts (Experiment 2). 
@@ -121,11 +207,13 @@ Agents were oriented either with their eyes/nose directed towards the agent's lo
 There were two quadrants with perpendicular orientation and two quandrants with head-on oriented agents (wolfpack). 
 The type of the quadrant was chosen randomly on each trial. \\
 
-\subsection{Task and Design}
-We tested the bug and dart stimuli in two separate session with different subject samples. 
+\subsection*{Task and Design}
+We tested the bug and dart stimuli in two separate sessions with different subject samples. 
 We refer to these as Experiment 1 and Experiment 2 respectively.
-An experiment session consisted of 3 blocks with 42 trials per block.\\
-Block 1 went as follows. 
+An experiment session consisted of 3 blocks with 42 trials per block. 
+Overview of all conditions and the amount of obtained data is shown in table \ref{tab.taskoverview}. 
+We now provide detailed description. \\
+First block went as follows. 
 At the start of each trial the circular boundary and the initial position of the green circle was displayed. 
 Subject initiated the trial by bringing a cross-hair mouse cursor to the green circle and by clicking on its surface. 
 Furthermore, we ensured that the agent's initial position was at least 4 degrees away from the nearest agent. 
@@ -137,41 +225,394 @@ One agent disappeared.
 The subject then clicked the last location where he saw the missing agent with a cross-hair cursor. 
 The missing agent was chosen randomly from the three agents nearest to chasee. 
 Whenever possible we tried to select an agent that did not overlap and so that perpendicular and wolfpack agents were chosen approximately equally often within each block. \\
-In the second block the rotation point was shifted along anteroposterior axis. The magnitude of this shift was varied across trials. We used trial with displacement of -0.15, -0.05, 0.05, 0.1, 0.15 and 0.2. This range was suggested by pilot studies. Later we adapted the range and used 0.05, 0.1,0.15, 0.2 0.25 and 0.3. Otherwise the trials were identical: The displacement was either perpendicular or towards the green circle. The circles were organized into four quadrants based on the type of the displacement. Finally, each trial was followed by a location judgment task. This allowed us to check whether the displacement manipulation was succesful. In addition to the location judgments in the first two blocks we measured the time spent by the green circle in the quadrants with respect to the orientation of the circles.\\
-In third block only two agents from two different quadrants were shown: one with perpendicular and one with head-on orientation. The initial position of green circle set at the mid-point on the line connecting the two white circles. The trial started after the subjects clicked the green circle. The subjects were asked to move the green circle such that they stay at the mid-point between the two agents. In the first 18 trials the orientation was indicated by eyes. In the remaining 24 trials the eyes were not displayed and instead the agents were physically displaced in the direction of agent's orientation. The magnitude of displacement was varied with manipulated values identical to those used in block 2.\\
-The third block concluded with 13 trials. A white circle was shown for random interval of 2-3 seconds. Then the crosshair appeared and the the circle either disappeared (in the first five trials) or it remained visible. The subjects were asked to select the position of the white circle with cross hair. On first ten trials the eyes were displayed and their orientation was chosen randomly. \\
+In the second block the rotation point was shifted along anteroposterior axis. 
+The magnitude of this shift was varied across trials. 
+Furthermore, we calibrated the manipulation between subjects. 
+We wanted to obtain measurement of manipulations that were similar in magnitude to the displacement reported in the recall task and in the distance bisection task. 
+In experiment 1 we started with wide displacement range of $(-0.15, -0.05, 0.05, 0.1, 0.15, 0.2)$. 
+Later we adapted the range and to $(0.05, 0.1,0.15, 0.2 0.25,0.3)$. 
+In experiment 2 we first used values $(0.4, 0.2)$ and later $(-0.4, -0.2)$. 
+The reasons for using negative displacement are explained in section \ref{sec.b5}. 
+In experiment 1, we adjested the stimuli.
+These were now simple white circles without eyes.
+Otherwise the trials in block 2 were identical to block 1. 
+The displacement was either perpendicular or towards the green circle. 
+The agents were organized into four quadrants based on the type of the displacement. Finally, each trial was followed by a location recall task. 
+We included the recall task in order to make the first two blocks as similar as possible. 
+Furthermore it allowed us to check whether the displacement manipulation was succesful.
+In addition to the location judgments in the first two blocks we measured the time spent by the green circle in the quadrants with respect to the orientation of the circles.\\
+In third block only two agents from two different quadrants were shown: one with perpendicular and one with head-on orientation. 
+The initial position of green circle set at the mid-point on the line connecting the two agents. 
+The trial started after the subject clicked on the green circle. 
+The subjects were asked to move the green circle such that it stays at the mid-point between the two agents. 
+The first 18 trials were analoguous to block 1 in that there was no displacement and in experiment one the circles had eyes. 
+In the remaining 24 trials the eyes were not displayed and the agents were physically displaced in the direction of agent's orientation. 
+The schedule for the magnitude of displacement was identical to the one used in block 2.\\
+A final block concluded with 13 trials. 
+An agent was shown for random interval of 2-3 seconds. 
+Then the crosshair appeared and the the agent either disappeared (in the first five trials) or it remained visible. 
+The subjects were asked to select the position of the agent with cross hair. 
+On the first ten trials of experiment 1 the eyes were displayed and their orientation was chosen randomly. 
+Similarly the orientation of darts in experiment 2 was chosen randomly.\\
  
-\subsection{Eyetracking}
+\subsection*{Eyetracking}
 Immediately before taking part in the current experiment the subjects participated as an adult control group in an infant eye-tracking study. 
 This experiment took 5-10 minutes. 
 Since the subjects were already seated at a calibrated eyetracker we decided to include eyetracking measurements although no analyses of the eyetracking data were planned and none were performed.
 
-\subsection{Procedure}
+\subsection*{Procedure}
 In block 1 and 2 subjects were instructed to avoid collisions with white agents by moving the green circle with mouse. 
 In block 3 subjects were asked to move the green circle such that it stays between the two white agents. \\
 The subjects were seated 50-70 cm away from screen (all specifications in degrees of visual angle are referenced to 50 cm distance) of a Tobii T60 display with built-in remote eye-tracker. 
 Upon the conclusion of the experiment the subjects were debriefed and dismissed. 
 Each block lasted 15 minutes and there was a brief break between them.\\
-The experiment was presented and controlled with PsychoPy 1.77 \citep{peirce07} and Tobii SDK 3.0. 
+The experiment was presented and controlled with PsychoPy 1.77 \cite{peirce07} and Tobii SDK 3.0. 
 The analyses were performed with Python 2.7 and STAN 2.0.1.
 
-\subsection{Materials and Data}
+\subsection*{Materials and Data}
 Subjects gave informed consent to participate in the study and were further given an option to make their data available for sharing with other researchers. 
 All subjects agreed. 
 The materials and data are available from \url{http://github.com/simkovic/wolfpackRevisited}. 
 We  documented all analyses we made in the form of IPython Notebooks which are also available from the online repository. 
 
-\subsection{Analyses}
-In block 1 and 2, we are interested in the direction of the displacement of the last location judgments of the missing circle with respect to its actual position. We expect four predictors to influence the displacement. First, representational gravity pulls objects down along the vertical axis. Second, under the influence of representational momentum subjects interpolate future positions along the motion trajectory of object and recall these as the last position. Third, we call the displacement in the direction of the circles orientation (as indicated by the eyes' location or physical displacement in the third block), orientation displacement. Finally, we expect that the last position of the green circle (controled by mouse) will influence the judgment. In particular we expect the judgment to be pulled towards the last mouse position. We call this effect the lazy-hand gravity.\\
-More formally, let $\mathbf \theta_i =[\theta_{ix}, \theta_{iy}]$ be the vector of the difference between the indicated and the actual position of the vanished circle at trial $i$ along the two axes. Let $\phi_{ik}$ be the angle given by the direction of the predictor at trial $i$, with $k$ the predictor (as listed in the previous paragraph). Then we are interested in the estimates of the regression coefficients $\alpha^1_k$ given by the equation\\
+\subsection*{Statistical Modeling}
+In the reported analyses we follow the approach advocated in \cite{gelman07} and \cite{gelman13}. 
+We first design a model captures well the patterns present in the data. 
+We use posterior predictive checking to decide whether the model is acceptable. 
+We start by fitting a separate model for each subject. 
+We then design a hierarchical model that pools data across subjects \cite{lee11}. 
+Hierarchical models can be easily formulated within bayesian framework and evaluated with sampling algorithms.
+Finally we report and interpret the estimates of population variables that are of theoretical interest. We report the mean estimate and the 95 percent range of the estimate.\\
+The main advantage of this approach is that it gives us flexibility to design complex models that match (or at least approach) the complexity of the processes that generated the data.
+The model design involves decisions which may considerably alter the posterior estimates and even the conclusions of the study.
+We discuss some of the modeling decisions below. 
+The analyses are documented and can be replicated with the IPython Notebooks available from the project repository.
+In general, virtually all results held at least to some degrees across all the various models we evaluated and as such the main conclusions of this report are robust.
 
+\section*{Results}
+
+\subsection*{Localization and Recall of Static Stimuli}
+
+The data are shown in figure \ref{fig.b5} and summary statistics is given in \ref{tab.b5}. 
+As expected, the localization judgments (B, C, E, G) are more precise than recall (A, D, F). Darts show systematic displacement in the direction of the nose (D-G). 
+Bugs show no such displacement although the recall task (A) may be worth further investigation. 
+Furthermore, the reported origin is displaced further towards the nose than the center of mass (shown as vertical dashed line at 0.13 in figure \ref{fig.b5}). 
+Recall that the task with static stimuli was preceded by task with stimuli where the origin was shifted. 
+Does the reported location of static stimuli reflect learning and transfer of knowledge from the previous task? 
+The second row (D, E) shows data for subjects who saw the origin shifted towards the nose (dots in figure \ref{fig.man}). 
+The data are consistent with a learning account. 
+However, in third row (F, G) we should expect judgment shifted to the left, but we don't observe any reliable difference between the two groups of subjects. 
+Finally, there are notable differences between the subjects. 
+The dark purple subject located the origin at the nose and did so also during recall. 
+The green subject located the origin behind the dart but only when the stimulus remained on the screen. 
+
+\subsection*{Distance Bisection}
+\subsubsection*{Bugs}
+Figure \ref{fig.b3} shows data from trials where the origin was located at the zero for bug (A) and dart (B) stimuli. 
+As expected, most of the measurements and subject medians are located in the lower right quadrant.
+We estimated the magnitude of perceived displacement on the x and y axis separately with a hierarchical model (S3.1 with D1.3.1). Subjects judge the wolf as shifted by $0.25 \; [0.11,0.39]$ degrees in direction of its nose (S3.1 $\mu{\mu,x}$). Similar, the orientation of perpendicular agent also influences where subjects put the point of mid-distance. The perpendicular agent is perceived as shifted by $0.09\; [-0.03,0.21]$ \footnote{This would be $-0.1$ in figure \ref{fig.b3}} (S3.1 $\mu{\mu,x}$). The origin displacement on y axis is smaller than on x axis. As can be seen in figure \ref{fig.b3} not all subjects do show this displacement and as a result the estimated value is smaller and noisier.\\
+\subsubsection*{Darts}
+Bisection judgments for dart stimuli (D2.3.1) are shown in panel B of figure \ref{fig:b3}. As with bugs we fit a hierarchical model (S3.1) for each axis. The same model can be applied to trials where the origin was shifted (D2.3.2 and D2.3.3). The results for x axis are shown in figure \ref{fig:b3reg} A. As expected, the jugments lie on a line with slope approximately 1. We can use this fact to include all bisection data in a a single regression model (S3.2). The fitted regression line is shown in red in figure \ref{fig:b3reg}. The slope is $1.04\; [0.87,1.23]$. Of more interest is the line's offset that gives the perceived displacement independent of the manipulated displacement (and relative to the nominal zero shown in figure \ref{fig:man}). The offset is $0.25\; [0.2,0.29]$. This is considerably larger than zero and larger than the location of center of mass would predict. The data are however consistent with the judgments of the origin of static darts.\\
+Similar evaluation was applied for the displacement due to the orientation of the perpendicular dart. The separate estimates for each condition (S3.1) show that the data points do not lie on a line but rather form a sigmoidal curve. If we fit a line observe a slope of $0.88\; [0.63,1.1]$ and a constant offset of $0.15\; [0.09,0.2]$.
+
+\subsubsection*{Circles}
+We can fit the regression model (S3.2) to bisection data which used circles with displaced location. In this case there is no orientation cue apart from the manipulated displacement. The slope on the x axis was $0.86\; [0.01,1.74]$ and $0.5 \;[-0.27,1.3]$ for y axis. These estimates are very imprecise due to small sample size. However, we see that also here the displacement on y axis is smaller than on x axis. This effect is thus most probably a property of the task and does not reflect the true displacement.   
+
+\subsection*{Location Recall} 
+\subsubsection*{Statistical Modeling} 
+In block 1 and 2, we are interested in the direction of the displacement of the last location judgments of the missing circle with respect to its actual position. 
+We expected four factors to influence the displacement. First, representational gravity pulls objects down along the vertical axis. Second, under the influence of representational momentum subjects interpolate future positions along the motion trajectory of object and recall these as the last position. Third, we expect that the last position of the green circle (controled by mouse) will influence the judgment. In particular we expect the judgment to be pulled towards the last mouse position. We call this effect the lazy-hand gravity. 
+Finally, we call the displacement in the direction of the circle's orientation (as indicated by the eyes' location or physical displacement in the third block), orientation displacement.\\
+Some of the above mentioned factors are correlated. Therefore we formulate a regression model. 
+We assume that the influence of the four factors is linearly additive. This is illustrated in figure \ref{fig:vectors}. 
+Several studies of memory displacement demonstrated additivity.
+Furthermore we assume bivariate gaussian distribution. Figure \ref{fig:b1} shows that this assumption is not implausible.\\ % citation here
+More formally, let $\mathbf h =[h_{x}, h_{y}]$ be the vector of the difference between the indicated and the actual position of the vanished circle along the two axes. Let $\phi_{k}$ be the angle given by the direction of the predictor with $k$ giving the predictor (as listed in the previous paragraph). Then we are interested in the estimates of the regression coefficients $\alpha_k$ given by the equation\\
 \begin{equation}
-\mathbf \theta_i \sim  \mathcal{N}\left(\sum_k \alpha_k \begin{bmatrix} \cos \phi_{ik} \\ \sin \phi_{ik} \end{bmatrix}, I\sigma_\theta^{-2} \right)
+\mathbf h \sim  \mathcal{N}\left(\sum_k \alpha_k \begin{bmatrix} \cos \phi_{k} \\ \sin \phi_{k} \end{bmatrix}, \sigma_h I_{2 \times 2} \right).
 \end{equation} 
+The regression coefficients are directly interpretable. They give the magnitude of the displacement due to each factor in degrees (for $h$ in degrees).\\
+Once more we use hierarchical model to pool the estimates across subjects and to obtain population estimates. A detailed formulation of the model is given in Table \ref{tab:models} (S1.1).
 
-As in \citet{gao10} we compute the proportion of the time spent in the wolfpack quadrants on each trial. We then estimate average proportion for each subject. \\
-In block 3 we estimate the displacement as follows. We rotate subjects' judgments in each around the nominal mid-point such that the wolf is located at 180 degrees and perpendicular agent is at 0 degrees. On each trial we discard first 2 seconds and compute the mean displacement during the remaining 15 seconds. We then use this data to estimate the displacement across trials and across subjects.\\
-Our general strategy is to first estimate parameters for each subject individually and then to pool estimates with a hierarchical model whenever meaningful. Our within-subject design does not allow us to collect more data points so that in some cases the individual estimates are as robust as we would desire. Hierarchical modeling allows us to pool information across subjects and to obtain more reliable estimates of the individual parameters. More information on hierarchical modeling can be found in \citet{gelman07} and \citet{lee11}.\\
+\subsubsection*{Bugs}
+Figure \ref{fig:b1} shows how the various factors influence the displacement of recall. There is no indication of influence of representational gravity or momentum. The lazy hand gravity and agent orientation are equally strong and confounded. As a result the data in C and D are shifted diagonally. In C on half of the trials the agent is oriented in the same direction as lazy hand gravity. On the other half of trials the agent is oriented in the negative direction of the vertical axis. To disentangle the influence of the two factors we look at the estimates provided by the model mentioned in the previous paragraph (S1.1). These are shown in Table \ref{tab:recall}. Of most interest to us the displacement due to orientation $0.14 \; [0.01,0.27]$ is significantly different from zero. The recalled locations are shifted in direction of eyes although the magnitude of this shift is smaller than that observed in the distance bisection task.\\
+
+\subsubsection*{Darts}
+As in the analysis of the bisection task for darts stimuli we group the data according to where the origin was located (see figure \ref{fig:man}) and estimate separate model (S1.1) for each condition. Then, we analyze all data together by adding a the magnitude of the manipulated displacement as a predictor of orientation displacement $\alpha_4 = \mu{\alpha,4}+ \beta_{\alpha,4}d $, where $d$ is the displacement and $\beta_{\alpha,4}$ is the slope coefficient (see S1.2 for more details). However, we obtained a regression line with a slope of $0.79 \; [0.57,1.02]$ that inadequately fit the data from trials where displacement was manipulated. This misfit was caused by the data from trials without displacement. We four times more data from these trials and they pulled the slope of regression line towards lower values. We therefore omitted these trials from line fitting and report the results of a separate model (S1.1). The results are shown in Table \ref{tab:recall}. As expected, the slope is around 1 and we observe positive constant displacement due to dart's orientation.
+
+\subsubsection*{Circles}
+
+Cirles provide control condition where there is no constant orientation cue. For the sake of completness, the results of fitting the regression model (S1.2) are shown in the last row of Table \ref{tab:recall}. Due to small sample size the estimates are very noisy. However, the magnitude of displacement factors other than orientation is similar to that observed with other stimuli.
+
+\subsection*{Leave-Me-Alone Task}
+\subsubsection*{Statistical Modeling}
+\cite{gao10} computed the proportion of time spent in the wolfpack quadrants on each trial. They then computed average proportion for each subject and showed with a t-test that the subject averages are significantly lower than 0.5 which is the expected proportion if subjects show no preference.\\
+Such analysis is problematic because it discards the within-subject variability which is actually huge. As a consequence the precision of the mean estimate is overestimated. We can use hierarchical model that also account for within-subject variability as we did in our previous analyses. In principle, we could model the proportion with a (truncated) gaussian. However, for several subjects the distribution trial proportion estimates is virtually flat, which makes it impossible to fit gaussian. Instead we use beta distribution parametrized by mean proportion and sample size. We also use beta distribution to model the individual differences. Alternatively, we explored fitting hierarchical gaussian model to data transformed by logit function. Both the beta and logit model fit the data well. Furthermore, the two models give practically identical estimates of the variables of interest. We report the results of the beta model since its parameters are directly interpretable, while the parameters of logit model require transformation.\\
+
+\subsubsection*{Bugs}
+We did not replicate the results of Experiment 3b in \cite{gao10}. Figure \ref{fig:gao} shows the confidence intervals based on the analyses reported in \cite{gao10} along with the averages for each of our subjects. All but one subject average was located on the upper side of the confidence interval. Using the hierarchical beta model we obtained an estimate of $0.504 \; [0.481,0.525] $ for the proportion of time spent in wolfpack quadrants. Notably the mean estimate of $0.469$ reported by \cite{gao10} is inconsitent with our data.\\
+
+\subsubsection*{Darts}
+As with previous models we extend the beta model by the magnitude of the origin shift as a linear predictor. Again we plot the regression line together with the estimates for sets of trials separated by the origin shift. The results are shown in figure \ref{fig:lmareg}. In the trials with no origin shift the mean proportion estimate is $0.478 \; [0.466,0.49]$ %which is consistent with $0.47$ reported by \cite{gao10} for their Experiment 3a. 
+The estimate of constant displacement in the regression model is $0.482 \; [0.474,0.489]$. A shift of origin by one degree away from the nose decreases the mean proportion of time spent in wolfpack quadrants by $0.093 \; [0.053,0.132]$. That is a shift of the origin towards the nose makes the wolfpack effect in the Leave-Me-Alone task smaller. We can compute an estimate of the required origin shift in order for the wolfpack effect to vanish. Provided that our regression model is the correct model for the relationship between the two variables, the estimate is given by $ $.\\
+Finally, we again observe a sigmoidal pattern in the individual estimates, which undermines the validity of the linear model.\\
+
+\subsubsection*{Circles}
+We fitted the regression model to the data from leave-me-alone task obtained with circles. The slope was estimated at $-0.01 \; [-0.135,0.112]$. The subjects were not responsible to the manipulation as they were with darts.
+
+\section*{Discussion} 
+
+ 
+
+%In block 3 we estimate the displacement as follows. We rotate subjects' judgments in each around the nominal mid-point such that the wolf is located at 180 degrees and perpendicular agent is at 0 degrees. On each trial we discard first 2 seconds and compute the mean displacement during the remaining 15 seconds. We then use this data to estimate the displacement across trials and across subjects.\\
+
+% Do NOT remove this, even if you are not including acknowledgments
+\section*{Acknowledgments}
+
+
+%\section*{References}
+% The bibtex filename
+\bibliography{literature}
+
+\section*{Figure Legends}
+
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics{fig/man}
+\end{center}
+\caption{
+{\bf Position of Shifted Origin.}
+Dots and crosses show where the origin of dart was set in Block 2 and Block 3 for the dart stimuli. 
+Negative values shift the origin towards the nose while positive values shift in the opposite direction.
+}
+\label{fig:man}
+\end{figure}
+
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics{fig/vectors}
+\end{center}
+\caption{
+{\bf Additivity of Different Displacement factors.}
+As explained in text we expect four different factors to influence displacement, namely representational gravity (black), representational momentum (blue) Lazy Hand Gravity (green) and Agent's Orientation (red). The result of the confluence of these factors is a displacement whose position is the sum of the infividual vectors. One way to visualize vector addition is to translate and superpose the individual vectors over each other so that they form a connected path. This is shown by the opaque arrows.  
+}\label{fig:vectors}
+\end{figure}
+
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics{fig/b5}
+\end{center}
+\caption{
+{\bf Recall and Localization of Static Stimuli.}
+The first row shows the data from Experiment 1 while the remaining rows show data obtained with darts. 
+The first column shows recalled position while the remaining columns show positions selected while the stimulus remained visible.
+Each cell shows measurements that were rotated around the agents's center such that the direction of eyes/nose is alligned with the positive direction of the horizontal axis.  
+Dots show individual trials while the crosses show median for each subject.  
+The color of the symbols distinguishes different subjects and is consistent across columns.
+The agents are drawn to scale on the background of each cell.  
+The dashed line indicates the median displacement in direction of the agent's orientation. 
+The shaded area shows the inter-quartile range. 
+The dotted line in d-g shows the displacement of darts' center of mass.
+}
+\label{fig:b5}
+\end{figure}
+
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics{fig/b3}
+\end{center}
+\caption{
+{\bf Results of the Distance Bisection task.}
+The results for bugs are shown in A and for darts in B.
+Each trial took 17 seconds. We discarded first 2 seconds and computed average mouse displacement with respect to the true mid-point. We 
+rotate subjects' judgments around the nominal mid-point such that the wolf is located at 180 degrees and perpendicular agent is at 0 degrees. Each trial is shown above as a dot. Each cross shows an subject average. Furthermore the data from subjects are color-coded.
+}
+\label{fig:b3}
+\end{figure}
+
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics{fig/b3reg}
+\end{center}
+\caption{
+{\bf Relation between the Perceived and Manipulated Displacement in the Distance Bisection Task.} The displacement on x axis is shown in A, while the displacement on y axis is shown in B. In each cell the perceived displacement (vertical axis) is shown in relation to the manipulated origin shift on the horizontal axis.  
+Blue errorbars show the estimates for individual conditions. In red are shown the results of fitting a regression line to the data. The red line shows the mean estimate while the light and dark red band show respectively the 95 \% and 50 \% range around the mean. }
+\label{fig:b3reg}
+\end{figure}
+
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics{fig/vectors}
+\end{center}
+\caption{
+{\bf Displacement in the Location Recall Task.}
+Each of the four factors is shown in a separate cell. Dots show individual trials while the crosses show subject averages. Each subject is shown in different color. The measurements are rotated such that the orientation of the displacement factor across trials is alligned with the positive direction of the horizontal axis. Note, there are measurements beyond -2 and 2 degrees that are not shown.
+}\label{fig:vec}
+\end{figure}
+
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics{fig/b2reg}
+\end{center}
+\caption{
+{\bf Relation between Perceived and the Manipulated Displacement in the Location Recall task.}
+This figure uses the same layout as figure \ref{fig:b3reg}. Refer to the caption of figure \ref{fig:b3reg} for details.
+}\label{fig:b2reg}
+\end{figure}
+
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics{fig/lmaReg}
+\end{center}
+\caption{
+{\bf Relation between Wolfpack avoidance and the Manipulated Displacement.}
+This figure uses the same layout as figure \ref{fig:b3reg}. Refer to the caption of figure \ref{fig:b3reg} for details.
+}\label{fig:lmaReg}
+\end{figure}
+
+\section*{Tables}
+% diese Tabelle ist furchtbar riesig
+\begin{table}[!ht]
+\caption{
+\bf{Data Overview}}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+Block & Agent & Task & $d$ & $n_s$ & $n_v/n_t$ & Label\\
+\hline
+$1$ & Bug & LMA & $0$ & $13$ & $42/42$ & D1.1.1 \\
+\hline
+ & & LR & $0$ & $13$ & $33.7/42$ & D1.1.2 \\
+\hline
+ $2$ & Circle & LMA & $(-0.15, -0.05, 0.05, 0.1, 0.15, 0.2)$ & $5$ & $42/42$  & D1.2.1\\
+\hline
+ &  & & $(0.05, 0.1,0.15, 0.2, 0.25,0.3)$ & $8$ & $42/42$ & D1.2.2\\
+\hline
+ & & LR & $(-0.15, -0.05, 0.05, 0.1, 0.15, 0.2)$ & $5$ & $39.2/42$& D1.2.3 \\
+\hline
+ &  &  & $(0.05, 0.1,0.15, 0.2, 0.25,0.3)$ & $8$ & $33.8/42$ & D1.2.4 \\
+\hline
+ $3$ & Bug & DB & $0$ & $13$ & $18/18$ & D1.3.1\\
+\hline
+ & Circle & DB & $(-0.15, -0.05, 0.05, 0.1, 0.15, 0.2)$ & $5$ & $22/22$ & D1.3.2\\
+\hline
+ & & & $(0.05, 0.1,0.15, 0.2 0.25,0.3)$ & $8$ & $22/22$ & D1.3.3\\
+\hline
+ & Bug & SR & - & $8$ & $4.9/5$ & D1.3.4\\
+\hline
+ & & SL & - & $8$ & $5.0/5$ & D1.3.5\\
+\hline
+ & Circle & SL & - & $8$ & $3.0/3$ & D1.3.6\\
+\hline
+ $1$ & Dart & LMA & $0$ & $28$ & $42/42$ & D2.1.1 \\
+\hline
+ & & LR & $0$ & $28$ & $30.6/42$ & D2.1.2\\
+\hline
+$2$ & Dart & LMA & $(-0.4,-0.2)$ & $16$ & $42/42$ & D2.2.1  \\
+\hline
+ & & & $(0.2, 0.4)$ & $9$ & $42/42$ & D2.2.2 \\
+\hline
+ & & LR & $(-0.4,-0.2)$ & $16$ & $36.5/42$ & D2.2.3 \\
+\hline
+ & & & $(0.2, 0.4)$ & $9$ & $36.1/42$ & D2.2.4 \\
+\hline
+$3$ & Dart & DB & $0$ & $25$ & $18/18$ & D2.3.1 \\
+\hline
+ & & & $(-0.4,-0.2)$ & $16$ &$22/22$ & D2.3.2 \\
+\hline
+ & & & $(0.2, 0.4)$ & $9$ & $22/22$ & D2.3.3 \\
+\hline
+ & & SR & - & $23$ & $4.7/5$ & D2.3.4 \\
+\hline
+ & & SL & - & $23$ & $7.8/8$ & D2.3.5 \\
+\hline
+\end{tabular}
+\begin{flushleft} $n_s$ - number of subjects\\ 
+$n_v/n_t$ - proportion of trials that entered into the analysis, where $n_v$ the number of valid trials and $n_t$ gives the total number of trials
+\\
+Wherever the $n_v$ varied across subjects an average across subjects is provided \\
+$d$ - shift as explained in figure \ref{fig:man}\\
+LMA - Leave-Me-Alone task, LR - Location Recall, DB - Distance Bisection Task, SR - recall of position of static stimuli, SL - localization of static stimuli
+\end{flushleft}
+\label{tab:data}
+\end{table}
+
+\begin{table}[!ht]
+\caption{
+\bf{Overview of fitted models}}
+\begin{tabular}{|p{6.5cm}|p{6cm}|c|}
+\hline
+\centering{Observed Variables} & \centering{Model Specification} & Label\\
+\hline
+\centering{$\mathbf h_{t,i}$ gives the vector of displacement in the location judgment task for subject $i$ on trial $t$; $\phi_{i,t,k}$ angle giving the direction of factor $k$ on trial $t$ for subject $i$}
+& \centering{$ h_{t,i}^x \sim  \mathcal{N}(\sum_k \alpha_{k,i}\cos \phi_{i,t,k}, \sigma_{h,i})$ $ h_{t,i}^y \sim  \mathcal{N}(\sum_k \alpha_{k,i} \sin \phi_{i,t,k}, \sigma_{h,i} )$ $\alpha_{k,i} \sim \mathcal{N}(\mu_{\alpha,k},\sigma_{\alpha,k}) $}& S1.1 \\
+\hline
+\centering{$\mathbf h_{t,i},\phi_{i,t,k}$ same as in S1.1; $d_{t,i}$ magnitude of origin shift as explained in figure \ref{fig:man}}
+& \centering{$\alpha_{4,i,t} =\gamma_{i}+\beta_{i}d_{t,i} $  $\gamma_{i} ~ \sim \mathcal{N}(\mu_{\alpha,4},\sigma_{\alpha,4}) $ $\beta_{i} ~ \sim \mathcal{N}(\mu_{\beta},\sigma_{\beta})$; otherwise same as in S1.1} & S1.2\\
+\hline
+\centering{$w_{t,i}$ proportion of time spent in wolfpack areas by subject $i$ on trial $t$} &
+\centering{$w_{t,i} \sim \mathcal{B}(\mu_i,\nu_i)$ $\mu_i \sim \mathcal{B}(\mu_{\mu},\nu_{\mu})$}& S2.1 \\
+\hline
+\centering{$w_{t,i}$ as in S2.1; $d_{t,i}$ as in S1.2} &
+\centering{$ w_{t,i} \sim \mathcal{B}(\mu_i+\beta_i d_{t,i},\nu_i)$ $\mu_i \sim \mathcal{N}(\mu_{\mu},\sigma_\mu)$ $\beta_i \sim \mathcal{N}(\mu_{\beta},\sigma_\beta)$} & S2.2\\
+\hline
+\centering{$x_{t,i}, y_{t,i}$ displacement on the x and y axis of figure \ref{fig:b3} for subject $i$ on trial $t$} 
+& \centering{$x_{t,i} \sim \mathcal{N}(\mu_{x,i},\sigma_{x,i})$  $y_{t,i} \sim \mathcal{N}(\mu_{y,i},\sigma_{y,i})$ $\mu_{x,i} \sim \mathcal{N}(\mu_{\mu,x},\sigma_{\mu,x})$ $\mu_{y,i} \sim \mathcal{N}(\mu_{\mu,y},\sigma_{\mu,y})$}&  S3.1\\
+\hline
+\centering{$x_{t,i}, y_{t,i}$ as in S3.1, $d_{t,i}$ magnitude of origin shift as explained in figure \ref{fig:man}}
+& \centering{$x_{t,i} \sim \mathcal{N}(\mu_{x,i}+\beta_{x,i}d_{t,i},\sigma_{x,i})$ $y_{t,i} \sim \mathcal{N}(\mu_{y,i}+\beta_{y,i}d_{t,i},\sigma_{x,i})$  $\beta_{x,i} \sim \mathcal{N}(\mu_{\beta,x},\sigma_{\beta,x})$ $\beta_{y,i} \sim \mathcal{N}(\mu_{\beta,y},\sigma_{\beta,y})$ $\mu_{x,i},\mu_{y,i}$ as in S3.1} & S3.2\\
+\hline
+\end{tabular}
+\begin{flushleft}
+In general, greek letters are used for parameters and roman letters are used for observed variables.\\
+$\mathcal{N}(\mu,\sigma)$ - gaussian distribution parametrized by mean $\mu$ and standard deviation $\sigma$\\
+$\mathcal{B}(\mu,\nu)$ - beta distribution parametrized by mean proportion $\mu$ and sample size $\nu$
+\end{flushleft}
+\label{tab:models}
+\end{table}
+
+\begin{table}[!ht]
+\caption{
+\bf{Displacement of Static Agents}}
+\begin{tabular}{|c|c|c|l|}
+\hline
+Agent & Task & Figure Cell & Mean Displacement\\
+\hline
+Bug & Recall & A & $0.06 \; [-0.12,0.25]$ \\
+\hline
+Bug & Localization & B & $0.01 \; [-0.07,0.01]$ \\
+\hline
+Circle & Localization & C & $0.02 \; [-0.07,0.11]$ \\
+\hline
+Dart & Recall & D and F & $0.19 \; [0.12,0.25]$ \\
+\hline
+Dart & Localization & E and G & $0.22 \; [0.16,0.27]$ \\
+\hline
+\end{tabular}
+\begin{flushleft}
+\end{flushleft}
+\label{tab:b5}
+\end{table}
+
+\begin{table}[!ht]
+\caption{
+\bf{Displacement in Location Recall}}
+\begin{tabular}{|c|p{1.7cm}|p{1.7cm}|p{1.7cm}|p{1.7cm}|p{1.5cm}|p{1cm}|c|}
+\hline
+Agent & \centering{Gravity} & \centering{Momentum} & \centering{Lazy Hand} & \centering{Orientation} & \centering{Slope} & Data & Model\\
+\hline
+Bug & \centering{$0.01$ $[-0.21,0.22]$}& \centering{$-0.02$ $[-0.15,0.1]$}& \centering{$0.24$ $[-0.04,0.5]$} & \centering{$0.14$ $[0.01,0.27]$}& \centering{-} & D1.1.2 & S1.1\\
+\hline
+Dart & \centering{*} & \centering{$0.04$ $[-0.06,0.14]$} & \centering{$0.38 $ $[0.2,0.53]$} & \centering{$0.12$ $[0.03,0.2]$} & \centering{-} & D2.1.2 & S1.1\\
+\hline
+Dart & \centering{*} & \centering{$0.02$ $[-0.05,0.09]$}& \centering{$0.49$ $[0.32,0.65]$}& \centering{$0.13$ $[0.05,0.21]$}& \centering{$1.02$ $[0.79,1.24]$} & D2.2.3 D2.2.4 & S1.2\\
+\hline
+Circles & \centering{$-0.01$ $[-0.18,0.16]$} & \centering{$0$ $[-0.09,0.1]$}& \centering{$0.37$ $[0.15,0.61]$}& \centering{$0.02$ $[-0.11,0.15]$}& \centering{$1.2$ $[0.39,1.9]$} & D1.2.3 D1.2.4 & S1.2\\
+\hline
+\end{tabular}
+\begin{flushleft}
+\end{flushleft}
+\label{tab:recall}
+\end{table}
 
 \end{document}
 
