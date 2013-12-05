@@ -12,7 +12,7 @@ except: print 'Tobii import failed'
 
  
 class Gao10e3Experiment():
-    def __init__(self):
+    def __init__(self,of=None):
         # ask infos
         myDlg = gui.Dlg(title="Experiment zur Bewegungswahrnehmung",pos=Q.guiPos)   
         myDlg.addText('VP Infos')   
@@ -42,7 +42,8 @@ class Gao10e3Experiment():
         self.isDart= vpInfo[-1] == 'dart'
         # save settings, which we will use
         Q.save(Q.inputPath+'vp%03d'%self.id+Q.delim+'SettingsExp.pkl')
-        self.output = open(Q.outputPath+'vp%03d.res'%self.id,'a')
+        if of==None: self.output = open(Q.outputPath+'vp%03d.res'%self.id,'a')
+        else: self.output = open(Q.outputPath+of,'a')
         #init stuff
         self.wind=Q.initDisplay()
         # init text
@@ -298,16 +299,15 @@ class Gao10e3Experiment():
         core.wait(2)
         shp=['Kreis','Pfeil']
         self.text1.setText(u'Gleich sehen Sie einen %s verschwinden'%shp[int(self.isDart)])
-        else: self.text1.setText(u'Gleich sehen Sie einen Kreis verschwinden')
-        self.text2.setText(u'Bitte zeigen Sie seine letzte Position an')
-        self.text1.draw(); self.text2.draw()
+        self.text3.setText(u'Bitte zeigen Sie seine letzte Position an')
+        self.text1.draw(); self.text3.draw()
         self.wind.flip()
         core.wait(3)
         self.mouse.setPointer(self.pnt2)
         self.pos=np.ones((self.cond,2))*50
         self.oris=np.zeros(self.pos.shape[0]) 
         for k in range(13):
-            if k>4: self.text2.setText(u'Bitte klicken Sie die Position wo der %s steht an'%shp[int(self.isDart)])
+            if k>4: self.text3.setText(u'Bitte klicken Sie die Position wo der %s steht an'%shp[int(self.isDart)])
             if self.isDart: self.oris[0]=(2*np.random.rand()-1)*180
             else: self.oris[0]=(2*np.pi*np.random.rand()-np.pi)
             self.pos[0,Y]=0
@@ -320,7 +320,7 @@ class Gao10e3Experiment():
             epos[0,Y]+= np.sin(self.oris[0]+0.345)*0.71
             epos[0+self.cond,X]+= np.cos(self.oris[0]-0.345)*0.71
             epos[0+self.cond,Y]+= np.sin(self.oris[0]-0.345)*0.71
-            self.text2.draw()
+            self.text3.draw()
             self.elem.draw()
             if k<10 and not self.isDart: 
                 self.eyes.setXYs(epos)
@@ -334,6 +334,7 @@ class Gao10e3Experiment():
                     self.elem.draw()
                     if k<10 and not self.isDart: self.eyes.draw()
                 self.mouse.draw()
+                self.text3.draw()
                 self.wind.flip()
                 mkey=self.mouse.getPressed()
             mpos=self.mouse.getPos()
@@ -389,20 +390,27 @@ class MouseFromData():
     
 class DataReplay(Gao10e3Experiment):
     def __init__(self):
-        Gao10e3Experiment.__init__(self)
+        Gao10e3Experiment.__init__(self,of='datareplay.res')
         dat=np.loadtxt(Q.outputPath+'vp%03d.res'%self.id)
         self.aas= dat[dat[:,1]==2,:]
         self.aas=self.aas[:,[4,6,7]]
+    def flip(self):
+        Gao10e3Experiment.flip(self)
+        self.wind.getMovieFrame()
+        self.wind.saveMovieFrames(Q.outputPath+'vid%03d.png'%(self.f))
+        
     def getJudgment(self): pass
     def runBlock3(self): pass
     def bringMouseToPosition(self): pass
     def runTrial(self,*args):
         Gao10e3Experiment.runTrial(self,*args,replay=True)
+        
+        
 
 if __name__ == '__main__':
-    E=TobiiExperiment()
+    #E=TobiiExperiment()
     #E=Gao10e3Experiment()
-    #E=DataReplay()
+    E=DataReplay()
     E.run()
 
 
