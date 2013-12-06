@@ -211,10 +211,9 @@ There were two quadrants with perpendicular orientation and two quandrants with 
 The layout of the quadrants was chosen randomly on each trial. \\
 
 \subsection*{Tasks and Design}
-We tested the bug and dart stimuli in two separate sessions with different subject samples. 
-%We refer to these as Experiment 1 and Experiment 2 respectively. %ms oder auch nicht...
-An experiment session consisted of 3 blocks with 42 trials per block.  
-Overview of all conditions and the amount of obtained data is shown in table \ref{tab:data}. For some subjects not all blocks were run. This was  because the fixed time for the experiment have been exceeded. 
+We tested the bug and dart stimuli in two separate sessions with different samples of subjects. 
+Each experiment session consisted of 3 blocks with 42 trials per block.  
+Overview of all conditions and the amount of obtained data is shown in table \ref{tab:data}. For some subjects not all blocks were run. This was  because the fixed time for the experiment had been exceeded. 
 We now provide a detailed description. \\
 First block went as follows. 
 At the start of each trial the circular boundary and the initial position of the green circle was displayed. 
@@ -279,17 +278,24 @@ The materials and data are available from\\ \url{http://github.com/simkovic/wolf
 In the analyses reported below we follow the approach advocated in \cite{gelman07} and \cite{gelman13}. 
 We first design a model that appropriately describes the data. 
 We use posterior predictive checking to decide whether the model is acceptable. 
-We start by fitting a separate model for each subject. 
+We start by fitting simple model usally a model with separate parameters for each subject. 
 We then design a hierarchical model that pools data across subjects \cite{lee11a}. 
-Hierarchical models can be easily formulated within bayesian framework and are evaluated with sampling algorithms.
-Finally we report and interpret the estimates of population variables that are of theoretical interest. Where not specifically mentioned, we report the mean estimate and the 95 \% interval.\\
+Hierarchical models are most easily formulated and evaluated within bayesian framework.
+Finally we report and interpret the estimates of variables of interest - usually the population-level estimates. 
+We report the mean estimate and the 95 \% interval.\\
 The main advantage of this approach is that it gives us flexibility to design complex models that match (or at least approach) the complexity of the processes that generated the data.
 The model design involves decisions which may considerably alter the posterior estimates and even the conclusions of the analysis.
-We discuss some of the modeling decisions below. 
+We discuss some of these modeling decisions in the Results section below. In general, virtually all results held at least to some degree across all the various models we evaluated and as such the main conclusions of this report are robust.\\
+An overview of the models from which we report estimates is given in table \ref{tab:models}. 
+Bayesian model requires formulation of prior distributions for the analysis. 
+These are not included the table. 
+We selected priors such that they do not influence the results of estimation. 
+Usually we chose uniform priors, constrained to reasonable range of parameter values (e.g. range $[0,1]$ for mean proportion $\mu_{\mu}$ in S2.2). 
+The models were evaluated with STAN 2.0.1 which fits statistical models with Markov chain Monte Carlo sampling. 
+In each analysis, four chains were run and the convergence was checked by computing for each parameter an estimate of the potential scale reduction $\hat{R}$ (see \cite{gelman03} p.297). 
+In all analyses and for all parameters we ensured that $\hat{R} \leq 1.2$ where $\hat{R} = 1$ upon convergence.
 The analyses are documented and can be replicated with the IPython Notebooks available from the project repository.
-In general, virtually all results held at least to some degree across all the various models we evaluated and as such the main conclusions of this report are robust.\\
-The analyses were performed with Python 2.7 and STAN 2.0.1. 
-
+The table \ref{tab:ip} links the reported analyses to the output in these files. 
 \section*{Results}
 
 \subsection*{Localization and Recall of Static Stimuli}
@@ -314,7 +320,7 @@ Figure \ref{fig:b3} A shows data from trials where the nominal origin of bugs wa
 As expected, most of the measurements and subject medians are shifted towards bottom right.
 We estimated the magnitude of perceived displacement on the x and y axis separately with a hierarchical model (S3.1) for bug stimuli (D1.3.1). Subjects judge the wolf as shifted by $0.25 \; [0.11,0.39]$ degrees in direction of its nose ($\mu{\mu,x}$ S3.1). % ich konnte die variablennamen in klammern auffuhren. ware das hilfreich?
 Similar, the orientation of perpendicular agent also influences where subjects put the point of mid-distance. 
-The perpendicular agent is perceived as shifted by $0.09\; [-0.03,0.21]$ \footnote{This would be $-0.1$ in figure \ref{fig.b3}} (S3.1 $\mu{\mu,y}$). 
+The perpendicular agent is perceived as shifted by $0.09\; [-0.03,0.21]$ \footnote{This would be $-0.1$ in figure \ref{fig:b3}} (S3.1 $\mu{\mu,y}$). 
 The origin displacement on y axis is smaller than on x axis. 
 As can be seen in figure \ref{fig:b3} not all subjects do show this displacement and as a result the estimated value is smaller and noisier.\\
 
@@ -459,7 +465,7 @@ However, the slope estimate is very imprecise.
 \section*{Figure Legends}
 \begin{figure}[!ht]
 \begin{center}
-\includegraphics[width=15cm]{fig/exp}
+\includegraphics[width=6.83in]{fig/exp}
 \end{center}
 \caption{
 {\bf Task Overview}\\
@@ -479,7 +485,7 @@ Subject is asked to move the green circle such that it stays equidistant to the 
 
 \begin{figure}[!ht]
 \begin{center}
-\includegraphics{fig/man}
+\includegraphics[width=3.27in]{fig/man}
 \end{center}
 \caption{
 {\bf Position of Shifted Origin.}
@@ -493,17 +499,29 @@ If people perceive the origin to be shifted by $k$ degrees in direction of the n
 
 \begin{figure}[!ht]
 \begin{center}
-\includegraphics{fig/vectors}
+\includegraphics[width=3.27in]{fig/gao}
 \end{center}
 \caption{
-{\bf Additivity of Different Displacement factors.}
-As explained in text we expect four different factors to influence displacement, namely representational gravity (black), representational momentum (blue) Lazy Hand Gravity (green) and Agent's Orientation (red). The result of the confluence of these factors is a displacement whose position is the sum of the infividual vectors. One way to visualize vector addition is to translate and superpose the individual vectors over each other so that they form a connected path. This is shown by the opaque arrows.  
-}\label{fig:vectors}
+{\bf Failed Replication.}
+Dots show the average proportion of time spent in the wolfpack quadrants by subjects in our sample. 
+Red line shows the mean estimate reported in \cite{gao10} and the red surface shows the 95\% interval.
+}
+\label{fig:gao}
 \end{figure}
 
 \begin{figure}[!ht]
 \begin{center}
-\includegraphics{fig/b5}
+\includegraphics[width=3.27in]{fig/vectors}
+\end{center}
+\caption{
+{\bf Additivity of Different Displacement factors.}
+Four different factors influence the displacement (cross), namely representational gravity (black), representational momentum (blue) Lazy Hand Gravity (green) and Agent's Orientation (red). The result of the confluence of these factors is a displacement that is sum of the infividual vectors. One way to visualize vector addition is to translate and superpose the individual vectors over each other so that they form a connected path. This is shown by the opaque arrows.  
+}\label{fig:vec}
+\end{figure}
+
+\begin{figure}[!ht]
+\begin{center}
+\includegraphics[width=6.83in]{fig/b5}
 \end{center}
 \caption{
 {\bf Recall and Localization of Static Stimuli.}
@@ -515,14 +533,14 @@ The color of the symbols distinguishes different subjects and is consistent acro
 The agents are drawn to scale on the background of each cell.  
 The dashed line indicates the median displacement in direction of the agent's orientation. 
 The shaded area shows the inter-quartile range. 
-The dotted line in d-g shows the displacement of darts' center of mass.
+The dotted line in D-G shows the displacement of darts' center of mass.
 }
 \label{fig:b5}
 \end{figure}
 
 \begin{figure}[!ht]
 \begin{center}
-\includegraphics{fig/b3}
+\includegraphics[width=3.27in]{fig/b3}
 \end{center}
 \caption{
 {\bf Results of the Distance Bisection task.}
@@ -535,7 +553,7 @@ rotate subjects' judgments around the nominal mid-point such that the wolf is lo
 
 \begin{figure}[!ht]
 \begin{center}
-\includegraphics{fig/b3reg}
+\includegraphics[width=4.86in]{fig/b3reg}
 \end{center}
 \caption{
 {\bf Relation between the Perceived and Manipulated Displacement in the Distance Bisection Task.} The displacement on x axis is shown in A, while the displacement on y axis is shown in B. In each cell the perceived displacement (vertical axis) is shown in relation to the manipulated origin shift on the horizontal axis.  
@@ -545,17 +563,17 @@ Blue errorbars show the estimates for individual conditions. In red are shown th
 
 \begin{figure}[!ht]
 \begin{center}
-\includegraphics{fig/vectors}
+\includegraphics[width=4.86in]{fig/b1}
 \end{center}
 \caption{
 {\bf Displacement in the Location Recall Task.}
 Each of the four factors is shown in a separate cell. Dots show individual trials while the crosses show subject averages. Each subject is shown in different color. The measurements are rotated such that the orientation of the displacement factor across trials is alligned with the positive direction of the horizontal axis. Note, there are measurements beyond -2 and 2 degrees that are not shown.
-}\label{fig:vec}
+}\label{fig:b1}
 \end{figure}
 
 \begin{figure}[!ht]
 \begin{center}
-\includegraphics{fig/b2reg}
+\includegraphics[width=3.27in]{fig/b2reg}
 \end{center}
 \caption{
 {\bf Relation between Perceived and the Manipulated Displacement in the Location Recall task.}
@@ -565,7 +583,7 @@ This figure uses the same layout as figure \ref{fig:b3reg}. Refer to the caption
 
 \begin{figure}[!ht]
 \begin{center}
-\includegraphics{fig/lmaReg}
+\includegraphics[width=3.27in]{fig/lmaReg}
 \end{center}
 \caption{
 {\bf Relation between Wolfpack avoidance and the Manipulated Displacement.}
@@ -642,7 +660,7 @@ LMA - Leave-Me-Alone task, LR - Location Recall, DB - Distance Bisection Task, S
 \begin{table}[!ht]
 \caption{
 \bf{Overview of fitted models}}
-\begin{tabular}{|p{6.5cm}|p{6cm}|c|}
+\begin{tabular}{|p{6.5cm}|p{5cm}|c|}
 \hline
 \centering{Observed Variables} & \centering{Model Specification} & Label\\
 \hline
@@ -715,6 +733,24 @@ Circles & \centering{$-0.01$ $[-0.18,0.16]$} & \centering{$0$ $[-0.09,0.1]$}& \c
 \begin{flushleft}
 \end{flushleft}
 \label{tab:recall}
+\end{table}
+
+\begin{table}[!ht]
+\caption{
+\bf{Displacement of Static Agents}}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+Analysis & Data & Model & File & Input & Output\\
+\hline
+A1 & D1.3.1 & S3.1 & \texttt{E1B3.ipynb} & & \\
+A2 & D2.3.1 & S3.1 & \texttt{E2B3.ipynb} & & \\
+A3 & \centering{D2.3.1 D2.3.2 D2.3.3} & S3.1 & \texttt{E2B3.ipynb} & & \\
+A4 & \centering{D2.3.1 D2.3.2 D2.3.3} & S3.2 & \texttt{E2B3.ipynb} & & \\
+\hline
+\end{tabular}
+\begin{flushleft}
+\end{flushleft}
+\label{tab:ip}
 \end{table}
 
 \end{document}

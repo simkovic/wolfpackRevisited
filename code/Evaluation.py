@@ -14,13 +14,17 @@ mpl.rcParams['ytick.labelsize'] = 8
 mpl.rcParams['axes.titlesize'] = 12
 mpl.rcParams['axes.labelsize'] = 10
 mpl.rcParams['axes.linewidth'] = 1
-mpl.rcParams['savefig.dpi']=300
+mpl.rcParams['axes.edgecolor'] = '#262626'
 mpl.rcParams['savefig.extension']='png'
+mpl.rcParams['figure.dpi']=300
+mpl.rcParams['figure.autolayout']=True
+mpl.rcParams['font.sans-serif']='Arial'
+
 #some constants and settings
 TRAJPATH='/home/matus/Desktop/research/wolfpackRevisited/trajData/'
 BEHDPATH='/home/matus/Desktop/research/wolfpackRevisited/behData/'
 FIGPATH='/home/matus/Desktop/research/wolfpackRevisited/paper/fig/'
-
+#mpl.rcParams['savefig.directory']=FIGPATH
 X=0;Y=1;M=0;P=1;W=2
 man=[-0.15,-0.05,0.05,0.1,0.15,0.2,0.25,0.3,-0.2,-0.4,0.4]
 quadMaps=[[1,1,0,0],[0,0,1,1],[0,1,0,1],[1,0,1,0],[1,0,0,1],[0,1,1,0]]
@@ -130,7 +134,7 @@ def loadDataB12(vpn,correct=False):
     return D
 
 
-def loadDataB345(vpn,robust=False,correct=False):
+def loadDataB345(vpn,exp=1,robust=False,correct=False):
     N=len(vpn);
     B3=np.zeros((N,3,T))*np.nan#  0,1- displacement from the mid-section 
     #parallel and orthogonal to the line, 2- manipulated physical displacement
@@ -156,8 +160,8 @@ def loadDataB345(vpn,robust=False,correct=False):
             oriP=np.arctan(traj[:,:,M,Y]-traj[:,:,P,Y],traj[:,:,M,X]-traj[:,:,P,X])
             oriW=np.arctan(traj[:,:,M,Y]-traj[:,:,W,Y],traj[:,:,M,X]-traj[:,:,W,X])
             man=np.array(D[:,5],ndmin=2).T
-            traj[:,:,P,X]+= man*np.cos(oriP-np.pi/2)
-            traj[:,:,P,Y]+= man*np.sin(oriP-np.pi/2)
+            traj[:,:,P,X]+= man*np.cos(oriP+[+np.pi/2,-np.pi/2][exp-1])
+            traj[:,:,P,Y]+= man*np.sin(oriP+[+np.pi/2,-np.pi/2][exp-1])
             traj[:,:,W,X]+= man*np.cos(oriW)
             traj[:,:,W,Y]+= man*np.sin(oriW)
         traj=traj[:,int(2*MONHZ):,:,:]# discard first 2 seconds   
@@ -473,7 +477,7 @@ def plotManipulation():
     plt.plot(man[1],[0]*2,'xk',ms=8)
     #plt.gca().set_yticks([])
 def plotRotation():
-    plt.figure(figsize=[FIGCOL[0]]*2)
+    plt.figure(figsize=[FIGCOL[0]]*2,tight_layout=True,dpi=300)
     ax=plt.gca()
     ax.set_aspect('equal')
     plt.plot([0,AR],[0,0],color='b',zorder=-3)
@@ -484,8 +488,29 @@ def plotRotation():
     w= mpl.patches.Wedge((0,0),CoM,0,90,ec=None,fc='gray',fill=True,alpha=0.2)
     ax.add_patch(w)
     plt.plot([0],[0],'go',ms=8)
-    plt.plot([0],[CoM],'rx',ms=8,mew=2)
-    plt.plot([CoM],[0],'bx',ms=8,mew=2)
+    plt.plot([0],[CoM],'r+',ms=8,mew=2)
+    plt.plot([CoM],[0],'b+',ms=8,mew=2)
+    d=0.4
+    plt.plot([0],[d],'rx',ms=8,mew=2)
+    plt.plot([d],[0],'bx',ms=8,mew=2)
+    w= mpl.patches.Wedge((0,0),d,0,90,ec=None,fc='gray',fill=True,alpha=0.2)
+    ax.add_patch(w)
+def plotGao():
+    plt.figure(figsize=(FIGCOL[0],FIGCOL[0]*0.85),tight_layout=True,dpi=300)
+    n=7
+    ci=0.26/17.0*stats.t.ppf(0.975,n-1)/(n**0.5)
+    print ci
+    r=plt.Rectangle((-4,0.4688-ci),width=50,height=2*ci,fc='red',alpha=0.2,ec='white')
+    ax=plt.gca()
+    ax.add_patch(r)
+    plt.plot([-12,14],[0.4688,0.4688],'r')
+    x=range(1,D.shape[0]+1)
+    ppl.scatter(ax,x,D[:,0,:,0].mean(1))
+    plt.plot([-12,14],[0.5,0.5],'k')
+    plt.xlim([0,14])
+    ax.set_xticks(x)
+    plt.xlabel('Subject')
+    plt.ylabel('Prop. of Time in Wolfpack Quadrants')
 
 ##vpna=range(301,314)
 ##B3a,B4,B5a=loadDataB345(vpna)
@@ -508,7 +533,7 @@ def plotRotation():
 ##plotB3reg()
 ##plt.savefig(FIGPATH+'b3reg',bbox_inches='tight', pad_inches=0.1)
 ##
-##D=loadDataB12(vpna)
+#D=loadDataB12(vpna)
 ##plotB1(D)
 ##plt.savefig(FIGPATH+'b1')
 ##plotB2reg()
@@ -520,4 +545,6 @@ def plotRotation():
 ##plotB2Wreg()
 ##plt.savefig(FIGPATH+'lmaReg',bbox_inches='tight', pad_inches=0.1)
 ##plotRotation()
-##plt.savefig(FIGPATH+'rot',bbox_inches='tight', pad_inches=0.1)
+##plt.savefig(FIGPATH+'rot')
+##plotGao()
+##plt.savefig(FIGPATH+'gao')
