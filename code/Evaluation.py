@@ -219,7 +219,7 @@ def plotB1(D,exp=1):
                 fontdict={'weight':'bold'},fontsize=12)
     plt.subplots_adjust(left=0.07,bottom=0.05,top=0.95,hspace=0.12)
 def plotB2reg():
-    w=loadStanFit('E2B2LregCa.fit')
+    w=loadStanFit('E2B2LHregCa.fit')
     px=np.array(np.linspace(-0.5,0.5,101),ndmin=2)
     d=w['a4']
     a1=np.array(w['ma'][:,4],ndmin=2).T+1
@@ -294,7 +294,7 @@ def plotB5(B5s,vpns,clrs=None,exps=[1],suffix=''):
             #if kk>2: plt.gca().set_yticklabels([])
             if gg==0: plt.title(titles[kk-2],fontsize=12)
             #print np.array(v).sum(),float(seln.sum()), len(v)/float(xn.shape[0])
-            res.append(xn)
+            res.append([xn])
             xn=xn.flatten()[np.array(v)]
             
             #if gg==1: xxn=np.copy(xn)
@@ -307,7 +307,8 @@ def plotB5(B5s,vpns,clrs=None,exps=[1],suffix=''):
                     fontdict={'weight':'bold'},fontsize=12);tt+=1
             plt.plot([m,m],[-1,1],'--g',color='gray',label='_nolegend_',zorder=-2)
             sse=std(xn,bias=True)/xn.size**0.5
-            er= sse* stats.t.ppf(0.95,xn.size)
+            res[-1].extend([m,sse,xn.size])
+            er= sse* stats.t.ppf(0.975,xn.size)
             er=[m-2*er,m+2*er]#[sap(xn,25),sap(xn,75)]
             plt.gca().add_patch(plt.Rectangle([er[0],-5],er[1]-er[0],10,
                                     color='k',zorder=-2,alpha=0.1))
@@ -317,12 +318,11 @@ def plotB5(B5s,vpns,clrs=None,exps=[1],suffix=''):
                     bbox_transform=plt.gcf().transFigure,frameon=False)
             if exp==2:
                 x0=(1-3**0.5/2)*AR
-                print x0
                 for i in range(2):
                     plt.plot([x0,x0],[-1,1],':',color='gray')
     return res
 def plotB2Wreg():
-    w=loadStanFit('E2B2Wreg.fit')
+    w=loadStanFit('E2B2WHreg.fit')
     a1=np.array(w['ma1'],ndmin=2).T
     a0=np.array(w['ma0'],ndmin=2).T
     px=np.array(np.linspace(-0.5,0.5,101),ndmin=2)
@@ -390,10 +390,6 @@ def plotB3reg():
         ax.set_xticks(man)
         plt.xlim([-0.5,0.5])
         plt.ylim([-0.4,0.8])
-        plt.text(plt.xlim()[0]+0.1*(plt.xlim()[1]-plt.xlim()[0]),
-                 plt.ylim()[1]-0.1*(plt.ylim()[1]-plt.ylim()[0]), 
-                 str(unichr(65+b)),horizontalalignment='center',verticalalignment='center',
-                 fontdict={'weight':'bold'},fontsize=12)
         #plt.xlabel('Manipulated Displacement')
         if b==0:
             plt.ylabel('Perceived Displacemet')
@@ -405,10 +401,9 @@ def plotB3fit(fit,suffix='',pars=['mu','mmu']):
     D=fit.extract()[pars[0]]
     errorbar(D[:,:,X],x=0.9)
     plt.xlabel('Subject')
-    errorbar(D[:,:,Y],x=1.1,clr=(1,0.5,0.5),xaxis=False)
+    errorbar(D[:,:,Y],x=1.1,clr=(1,0.5,0.5))
     plt.ylabel('Displacement in Degrees')
-    plt.savefig(FIGPATH+'e1b3%s.png'%suffix,dpi=400,bbox_inches='tight', pad_inches=0)
-
+    if pars[1] is '': return
     d=fit.extract()[pars[1]]
     print 'X: %.3f, CI %.3f, %.3f'%(d[:,0].mean(), sap(d[:,0],2.5),sap(d[:,0],97.5))
     print  'Y: %.3f, CI %.3f, %.3f'%(d[:,1].mean(), sap(d[:,1],2.5),sap(d[:,1],97.5))
@@ -433,7 +428,6 @@ def plotB4(B4,clrs=None,exp=1):
             plt.ylim([-2,2])
             if d: plt.ylabel('y axis displacement')
             else: plt.ylabel('x axis displacement')
-    plt.savefig(FIGPATH+'e1b4.png',dpi=400,bbox_inches='tight', pad_inches=0.1)
 
 def plotVectors():
     plt.grid(axis='y')
@@ -505,6 +499,56 @@ def plotGao(D):
     ax.set_xticks(x)
     plt.xlabel('Subject')
     plt.ylabel('Prop. of Time in Wolfpack Quadrants')
+def plotComp():
+    E=[]
+    for i in range(1,3):
+        D=[]
+        if i==2: w=loadStanFit('E2B2LregCa.fit')
+        else: w=loadStanFit('E1B1LH.fit')
+        D.append(w['ma'][:,3])
+        w=loadStanFit('E%dB2Wreg.fit'%i)
+        D.append((w['ma0']-0.5)/w['ma1'])
+        if i==2: w=loadStanFit('E%dB3BHreg.fit'%i)
+        else:  w=loadStanFit('E1B3BH.fit')
+        D.append(w['mmu'][:,0])
+        if i==2:vpn=range(351,381); vpn.remove(369); vpn.remove(370)
+        else: vpn=range(301,314)
+        B3,B4,B5=loadDataB345(vpn,correct=False,exp=i)
+        b4=plotB5([B5],[vpn],exps=[i])
+        plt.close()
+        D.append(b4[0])
+        D.append(b4[1])
+        E.append(D)
+    figure(figsize=[FIGCOL[1],FIGCOL[0]])
+    for k in range(2):
+        D=E[k]
+        subplot(2,1,k+1)
+        clr=(0.2, 0.5, 0.6)
+        for i in range(len(D)):
+            if i==1 and k==0: continue
+            if i<3:
+                plt.plot([sap(D[i],2.5),sap(D[i],97.5) ],[i+1,i+1],color=clr)
+                plt.plot([sap(D[i],25),sap(D[i],75) ],[i+1,i+1],
+                         color=clr,lw=3,solid_capstyle='round')
+                plt.plot([D[i].mean()],[i+1],mfc=clr,mec=clr,ms=8,marker='+',mew=2)
+            else:
+                err= D[i][2]* stats.t.ppf(0.975,D[i][3])
+                plt.plot([D[i][1]-err, D[i][1]+err],[i+1,i+1],color=clr)
+                err= D[i][2]* stats.t.ppf(0.75,D[i][3])
+                plt.plot([D[i][1]-err, D[i][1]+err],[i+1,i+1],
+                         color=clr,lw=3,solid_capstyle='round')
+                plt.plot([D[i][1]],[i+1],mfc=clr,mec=clr,ms=8,marker='+',mew=2)
+        ax=plt.gca()       
+        plt.ylim([0,len(D)+1])
+        if k==1: plt.xlabel('Origin Shift')
+        else: ax.set_xticklabels([])
+        plt.xlim([-0.05,0.4])
+        #subplot_annotate(loc=[0.95,0.9])
+        plt.grid()
+        plt.ylabel(['Bugs','Darts'][k],fontsize=14)
+        ax.set_yticklabels(['','Location Recall','Leave-Me-Alone',
+            'Distance Bisection','Static Recall','Static Localization'])
+
 def saveFigures():
     vpna=range(301,314)
     B3a,B4,B5a=loadDataB345(vpna)
@@ -563,6 +607,9 @@ def saveFigures():
     figure(figsize=[FIGCOL[0]]*2)
     plotVectors()
     plt.savefig(FIGPATH+'vectors')
+
+    plotComp()
+    plt.savefig(FIGPATH+'compar')
 #saveFigures()
 def plotExp():    
     figure(figsize=[FIGCOL[2],FIGCOL[2]*0.35])
@@ -576,5 +623,6 @@ def plotExp():
             verticalalignment='center',fontdict={'weight':'bold'},fontsize=12)
     plt.subplots_adjust(bottom=0,top=1,wspace=-0.5,left=0,right=1)
     plt.savefig(FIGPATH+'exp',dpi=400,bbox_inches='tight')
+
 
 
