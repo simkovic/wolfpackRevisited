@@ -1,7 +1,7 @@
-Wolfpack Revisited
+Wolfpack Effect Revisited
 =================
 
-This is a repostitory for a psychology research project conducted at Universität Heidelberg by Matus Simkovic and Birgit Träuble in 2013. A peer-reviewed report has been published at 
+This is a repostitory for a psychology research project conducted at Universität Heidelberg by Matus Simkovic and Birgit Träuble during Autumn 2013.
 
 
 # License
