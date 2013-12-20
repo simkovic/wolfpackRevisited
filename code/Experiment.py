@@ -1,5 +1,27 @@
-
 # -*- coding: utf-8 -*-
+
+##    The MIT License (MIT)
+##
+##    Copyright (c) <2013> <Matus Simkovic>
+##
+##    Permission is hereby granted, free of charge, to any person obtaining a copy
+##    of this software and associated documentation files (the "Software"), to deal
+##    in the Software without restriction, including without limitation the rights
+##    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+##    copies of the Software, and to permit persons to whom the Software is
+##    furnished to do so, subject to the following conditions:
+##
+##    The above copyright notice and this permission notice shall be included in
+##    all copies or substantial portions of the Software.
+##
+##    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+##    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+##    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+##    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+##    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+##    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+##    THE SOFTWARE.
+
 from psychopy import visual, core, event,gui,sound,parallel
 from psychopy.misc import pix2deg, deg2pix
 import time, sys,os
@@ -223,7 +245,7 @@ class Gao10e3Experiment():
             while (np.any(np.sqrt(np.power(mpos-pos0,2).sum(1))<Q.initDistCC) or 
                 np.linalg.norm(mpos)>11.75):
                 mpos=np.matrix(np.random.rand(2)*23.5 -11.75)
-            # ask subject to bring the mouse on the position
+            # ask subject to bring the mouse to the position
             self.mouse.clickReset()
             mpos=np.array(mpos).squeeze()
         else: mpos=np.squeeze(self.traj[0,self.asel[0],:2]+self.traj[0,self.asel[1],:2])/2.0
@@ -386,7 +408,7 @@ class MouseFromData():
     def setPointer(self,pointer):
         self.pointer=pointer
     def _setPos(self,pos):
-        print 'Warning setting data position',self.getPos(),pos
+        print 'Warning: setting data position',self.getPos(),pos
     
 class DataReplay(Gao10e3Experiment):
     def __init__(self):
@@ -408,9 +430,10 @@ class DataReplay(Gao10e3Experiment):
         
 
 if __name__ == '__main__':
-    #E=TobiiExperiment()
-    #E=Gao10e3Experiment()
-    E=DataReplay()
+    #E=TobiiExperiment() # uncomment to run eyetracking experiment
+    #E=Gao10e3Experiment() # uncomment to run behavioral experiment
+    E=DataReplay() # uncomment to replay data
+    
     E.run()
 
 

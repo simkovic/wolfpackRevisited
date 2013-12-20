@@ -1,8 +1,29 @@
+##    The MIT License (MIT)
+##
+##    Copyright (c) <2013> <Matus Simkovic>
+##
+##    Permission is hereby granted, free of charge, to any person obtaining a copy
+##    of this software and associated documentation files (the "Software"), to deal
+##    in the Software without restriction, including without limitation the rights
+##    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+##    copies of the Software, and to permit persons to whom the Software is
+##    furnished to do so, subject to the following conditions:
+##
+##    The above copyright notice and this permission notice shall be included in
+##    all copies or substantial portions of the Software.
+##
+##    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+##    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+##    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+##    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+##    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+##    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+##    THE SOFTWARE.
+
 import numpy as np
 import pylab as plt
 import matplotlib as mpl
 import pystan
-#import prettyplotlib as ppl
 import scipy.stats as stats
 from scipy.stats import nanmean as mean
 from scipy.stats import nanmedian as median
@@ -24,9 +45,7 @@ AR=0.95 # radius of distractor circles in deg
 MAXD=4 # maximum accepted displacement magnitude in judgment task, inclusion criterion for stats
 MONHZ=75 # monitor frame rate in hz
 FIGCOL=[3.27,4.86,6.83] # width of figure for a 1,1.5 and 2 column layout of plosone article
-CoM=(1-3**0.5/2)*AR # shift of the origin due tocenter of mass (dart) 
-plt.close('all')
-plt.ion()
+CoM=(1-3**0.5/2)*AR # shift of the origin due to center of mass (dart) 
 
 def drawCircularAgent(pos,scale=1,eyes=True,ori=0,bcgclr=True,rc=[0.7]*3):
     ax=plt.gca();pos=np.array(pos)
@@ -56,7 +75,10 @@ def drawDartAgent(pos,scale=1,ori=0,bcgclr=True,eyes=True,rc=[0.7]*3,fill=True):
     ax.add_patch(c)
 
 def loadDataB12(vpn,correct=False):
-    ''' correct undoes the manipulation from block 2'''
+    ''' vpn - subjects for which data will be loaded
+        correct - if true undoes the manipulation from block 2
+        the format of the output matrix is described in E1B1.ipynb
+    '''
     D=np.zeros((len(vpn),2,T,11))*np.nan
     for i in range(len(vpn)):
         vp=vpn[i]
@@ -124,9 +146,20 @@ def loadDataB12(vpn,correct=False):
 
 
 def loadDataB345(vpn,exp=1,robust=False,correct=False):
+    ''' vpn - subjects for which data will be loaded
+        exp - 1==eyes, 2==darts
+        robust - if true, the displacement for each trial is computed
+            as frame-wise median, if false mean is used
+        correct - if true undoes the manipulation of nominal displacement
+        return three matrices B3,B4, B5
+        B3 - nominal displacement 0, B4 - nonzero nominal displacement
+        columns in B3 and B4 give 0,1- displacement from the mid-section 
+        parallel (horizontal) and orthogonal (vertical) to the line,
+        2- manipulated nominal displacement
+        B5 - columns give position recalled by subject in each trial + orientation
+    '''
     N=len(vpn);
-    B3=np.zeros((N,3,T))*np.nan#  0,1- displacement from the mid-section 
-    #parallel and orthogonal to the line, 2- manipulated physical displacement
+    B3=np.zeros((N,3,T))*np.nan#  
     B5=np.zeros((N,13,3))*np.nan# collect data from block 4
     if robust: fs=np.median
     else: fs=np.mean
@@ -221,6 +254,7 @@ def plotB1(D,exp=1):
                 str(unichr(65+k-1)),horizontalalignment='center',verticalalignment='center',
                 fontdict={'weight':'bold'},fontsize=12)
     plt.subplots_adjust(left=0.07,bottom=0.05,top=0.95,hspace=0.12)
+    
 def plotB2reg():
     w=loadStanFit('E2B2LHregCa.fit')
     px=np.array(np.linspace(-0.5,0.5,101),ndmin=2)
@@ -248,6 +282,7 @@ def plotB2reg():
     plt.ylim([-0.6,0.8])
     plt.xlabel('Nominal Displacement')
     plt.ylabel('Perceived Displacemet')
+    
 def plotB5(B5s,vpns,clrs=None,exps=[1],suffix=''):
     tt=0
     for gg in range(len(B5s)):
@@ -324,6 +359,7 @@ def plotB5(B5s,vpns,clrs=None,exps=[1],suffix=''):
                 for i in range(2):
                     plt.plot([x0,x0],[-1,1],':',color='gray')
     return res
+
 def plotB2Wreg():
     w=loadStanFit('E2B2WHreg.fit')
     a1=np.array(w['ma1'],ndmin=2).T
@@ -348,6 +384,7 @@ def plotB2Wreg():
     plt.ylim([0.4,0.56])
     plt.xlabel('Nominal Displacement')
     plt.ylabel('Prop. of Time in Wolfpack Quadrants')
+    
 def plotB3(B3,clrs=None,exp=1):
     if clrs is None: clrs=getColors(B3.shape[0])
     if exp==1: drawAgent=drawCircularAgent
@@ -365,6 +402,7 @@ def plotB3(B3,clrs=None,exp=1):
         ax.set_clip_on(False)
         ax.set_aspect('equal')
         #plt.title('Displacement in Degrees')
+        
 def plotB3reg():
     w=loadStanFit('E2B3BHreg.fit')
     printCI(w,'mmu')
@@ -455,6 +493,7 @@ def plotVectors():
     plt.arrow(0,0,0,-0.36,head_width=0.08,lw=2,color='k',length_includes_head=True)
 
     plt.plot([0.86],[-0.46],'+k',ms=16,mew=2)
+    
 def plotManipulation():
     plt.grid(axis='y')
     man=[[-0.15,-0.05,0.05,0.1,0.15,0.2],[0.05, 0.1, 0.15, 0.2, 0.25, 0.3]]
@@ -467,6 +506,7 @@ def plotManipulation():
     plt.plot(man[0],[0]*2,'ok')
     plt.plot(man[1],[0]*2,'xk',ms=8,mew=2)
     #plt.gca().set_yticks([])
+    
 def plotRotation():
     plt.grid(axis='y')
     ax=plt.gca()
@@ -486,6 +526,7 @@ def plotRotation():
     plt.plot([d],[0],'bx',ms=8,mew=2)
     w= mpl.patches.Wedge((0,0),d,0,90,ec=None,fc='gray',fill=True,alpha=0.2)
     ax.add_patch(w)
+    
 def plotGao(D):
     plt.grid(axis='y')
     n=7
@@ -503,6 +544,7 @@ def plotGao(D):
     ax.set_xticks(x)
     plt.xlabel('Subject')
     plt.ylabel('Prop. of Time in Wolfpack Quadrants')
+    
 def plotComp():
     E=[]
     for i in range(1,3):
@@ -617,7 +659,7 @@ def saveFigures():
 
     plotComp()
     plt.savefig(FIGPATH+'compar')
-saveFigures()
+    
 def plotExp():    
     figure(figsize=[FIGCOL[2],FIGCOL[2]*0.35])
     for i in range(3):
@@ -632,4 +674,6 @@ def plotExp():
     plt.savefig(FIGPATH+'exp',dpi=400,bbox_inches='tight')
 
 
+if __name__ == '__main__':
+    saveFigures()
 
