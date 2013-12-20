@@ -12,7 +12,7 @@ In blocks 0 and 1 the columns give:
 
 4. trial id 
 
-5. quadrant layout (see [Evaluation.py](https://github.com/simkovic/wolfpackRevisited/blob/master/code/Evaluation.py#L19> for details)
+5. quadrant layout (see [Evaluation.py](https://github.com/simkovic/wolfpackRevisited/blob/master/code/Evaluation.py#L19) for details)
 
 6. nominal displacement in degrees
 
