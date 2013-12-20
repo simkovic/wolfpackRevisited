@@ -21,7 +21,7 @@ T=42 # number of trials
 TDUR=17.0 # trial duration in seconds
 CHR=0.3 # radius of the green circle in deg
 AR=0.95 # radius of distractor circles in deg
-MAXD=4 # maximum accepted displacement magnitude in judgment task
+MAXD=4 # maximum accepted displacement magnitude in judgment task, inclusion criterion for stats
 MONHZ=75 # monitor frame rate in hz
 FIGCOL=[3.27,4.86,6.83] # width of figure for a 1,1.5 and 2 column layout of plosone article
 CoM=(1-3**0.5/2)*AR # shift of the origin due tocenter of mass (dart) 
@@ -186,18 +186,21 @@ def plotB1(D,exp=1):
             phi=D[i,0,:,6]-phiK
             x=np.cos(phi)*D[i,0,:,5]
             y=np.sin(phi)*D[i,0,:,5]
-            #plot perpendicular
-            sel=np.logical_and(D[i,0,:,4],D[i,0,:,2]==0)
-            plt.plot(x[sel],y[sel],'o',mfc=clrs[i],alpha=0.5,ms=3, mec='k',mew=0.15)
             # plot wolves
             sel=np.logical_and(D[i,0,:,4],D[i,0,:,2]==1)
             plt.plot(x[sel],y[sel],'o',mfc=clrs[i],alpha=0.5,ms=3, mec='k',mew=0.15)
+            #plot perpendicular
+            sel=np.logical_and(D[i,0,:,4],D[i,0,:,2]==0)
+            plt.plot(x[sel],y[sel],'o',mfc=clrs[i],alpha=0.5,ms=3, mec='k',mew=0.15)
             # display medians
+            #if k==3:print np.median(x[sel])
             plt.plot(np.median(x[D[i,0,:,4]==1]),
                      np.median(y[D[i,0,:,4]==1]),
                      'x',mec=clrs[i],mew=1.5,ms=6,alpha=1,zorder=3)
             #plt.xlabel('x axis');plt.ylabel('y axis')
             plt.xlim([-2,2]);plt.ylim([-2,2])
+            ax.set_xticks(range(-2,3))
+            ax.set_yticks(range(-2,3))
             plt.title(titles[k])
             plt.plot([-10,10],[0,0],color='#262626',lw=0.5)
             plt.plot([0,0],[-10,10],color='#262626',lw=0.5)
@@ -243,7 +246,7 @@ def plotB2reg():
     ax.set_xticks(man)
     plt.xlim([-0.5,0.5])
     plt.ylim([-0.6,0.8])
-    plt.xlabel('Manipulated Displacement')
+    plt.xlabel('Nominal Displacement')
     plt.ylabel('Perceived Displacemet')
 def plotB5(B5s,vpns,clrs=None,exps=[1],suffix=''):
     tt=0
@@ -343,7 +346,7 @@ def plotB2Wreg():
     ax.set_xticks(man)
     plt.xlim([-0.5,0.5])
     plt.ylim([0.4,0.56])
-    plt.xlabel('Manipulated Displacement')
+    plt.xlabel('Nominal Displacement')
     plt.ylabel('Prop. of Time in Wolfpack Quadrants')
 def plotB3(B3,clrs=None,exp=1):
     if clrs is None: clrs=getColors(B3.shape[0])
@@ -394,7 +397,7 @@ def plotB3reg():
         if b==0:
             plt.ylabel('Perceived Displacemet')
             plt.gca().set_yticklabels([])
-    plt.text(-1.1,-0.6,'Manipulated Displacement',fontsize=8);
+    plt.text(-1.1,-0.6,'Nominal Displacement',fontsize=8);
 
 def plotB3fit(fit,suffix='',pars=['mu','mmu']):
     plt.figure(figsize=(6,3))
@@ -475,7 +478,7 @@ def plotRotation():
     drawDartAgent((0,0),ori=0,bcgclr=False,rc='b',fill=False)
     w= mpl.patches.Wedge((0,0),CoM,0,90,ec=None,fc='gray',fill=True,alpha=0.2)
     ax.add_patch(w)
-    plt.plot([0],[0],'go',ms=8)
+    plt.plot([0],[0],'yo',ms=8)
     plt.plot([0],[CoM],'r+',ms=8,mew=2)
     plt.plot([CoM],[0],'b+',ms=8,mew=2)
     d=0.4
@@ -484,6 +487,7 @@ def plotRotation():
     w= mpl.patches.Wedge((0,0),d,0,90,ec=None,fc='gray',fill=True,alpha=0.2)
     ax.add_patch(w)
 def plotGao(D):
+    plt.grid(axis='y')
     n=7
     ci=0.26/17.0*stats.t.ppf(0.975,n-1)/(n**0.5)
     print ci
@@ -503,13 +507,16 @@ def plotComp():
     E=[]
     for i in range(1,3):
         D=[]
-        if i==2: w=loadStanFit('E2B2LregCa.fit')
+        if i==2: w=loadStanFit('E2B2LHregCa.fit')
         else: w=loadStanFit('E1B1LH.fit')
         D.append(w['ma'][:,3])
-        w=loadStanFit('E%dB2Wreg.fit'%i)
-        D.append((w['ma0']-0.5)/w['ma1'])
-        if i==2: w=loadStanFit('E%dB3BHreg.fit'%i)
-        else:  w=loadStanFit('E1B3BH.fit')
+        if i==2: 
+            w=loadStanFit('E%dB2WHreg.fit'%i)
+            D.append((w['ma0']-0.5)/w['ma1'])
+            w=loadStanFit('E%dB3BHreg.fit'%i)
+        else:
+            D.append([])
+            w=loadStanFit('E1B3BH.fit')
         D.append(w['mmu'][:,0])
         if i==2:vpn=range(351,381); vpn.remove(369); vpn.remove(370)
         else: vpn=range(301,314)
@@ -540,7 +547,7 @@ def plotComp():
                 plt.plot([D[i][1]],[i+1],mfc=clr,mec=clr,ms=8,marker='+',mew=2)
         ax=plt.gca()       
         plt.ylim([0,len(D)+1])
-        if k==1: plt.xlabel('Origin Shift')
+        if k==1: plt.xlabel('Perceived Displacement')
         else: ax.set_xticklabels([])
         plt.xlim([-0.05,0.4])
         #subplot_annotate(loc=[0.95,0.9])
@@ -610,7 +617,7 @@ def saveFigures():
 
     plotComp()
     plt.savefig(FIGPATH+'compar')
-#saveFigures()
+saveFigures()
 def plotExp():    
     figure(figsize=[FIGCOL[2],FIGCOL[2]*0.35])
     for i in range(3):
