@@ -10,6 +10,11 @@ IPython Notebooks
 
 * IndDif - IPython Notebook, documents the between blocks comparisons
 
+HTML
+--------
+
+To make the access easier, we provide HTML export of the content of the IPython Notebooks
+
 Python Code
 ----------
 

@@ -435,6 +435,7 @@ def plotB3reg():
         if b==0:
             plt.ylabel('Perceived Displacemet')
             plt.gca().set_yticklabels([])
+        subplot_annotate()
     plt.text(-1.1,-0.6,'Nominal Displacement',fontsize=8);
 
 def plotB3fit(fit,suffix='',pars=['mu','mmu']):
@@ -675,5 +676,6 @@ def plotExp():
 
 
 if __name__ == '__main__':
+    mpl.rcParams['savefig.format'] = 'tiff'
     saveFigures()
 
