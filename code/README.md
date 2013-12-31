@@ -19,7 +19,7 @@ Python Code
 
 * Settings.py - settings for the experiment
 
-* Constants.py - constants loaded by the experiment
+* Constants.py - constants used by the experiment
 
 
 Dependencies
@@ -34,4 +34,4 @@ Dependencies
 
 * [Tobii.py from Eyetracker](http://github.com/simkovic/eyetracking/blob/master/Tobii.py) to run eyetracking experiment
 
-* plottingtools.py for plotting of the results
+* [matusplotlib](https://github.com/simkovic/matusplotlib/) to reproduce the figures
