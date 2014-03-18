@@ -29,11 +29,13 @@ from scipy.stats import nanmean as mean
 from scipy.stats import nanmedian as median
 from scipy.stats import nanstd as std
 from scipy.stats import scoreatpercentile as sap
-from matusplotlib.plottingroutines import *
+from matustools.matusplotlib import *
+import os
 #some constants and settings
-TRAJPATH='/home/matus/Desktop/research/wolfpackRevisited/trajData/'
-BEHDPATH='/home/matus/Desktop/research/wolfpackRevisited/behData/'
-FIGPATH='/home/matus/Desktop/research/wolfpackRevisited/paper/fig/'
+BASE=os.getcwd().rstrip('code')+os.path.sep
+TRAJPATH=BASE+'trajData'+os.path.sep
+BEHDPATH=BASE+'behData'+os.path.sep
+FIGPATH=BASE+os.path.sep.join(['paper','fig',''])
 
 X=0;Y=1;M=0;P=1;W=2
 man=[-0.15,-0.05,0.05,0.1,0.15,0.2,0.25,0.3,-0.2,-0.4,0.4]
@@ -255,10 +257,9 @@ def plotB1(D,exp=1):
                 fontdict={'weight':'bold'},fontsize=12)
     plt.subplots_adjust(left=0.07,bottom=0.05,top=0.95,hspace=0.12)
     
-def plotB2reg():
-    w=loadStanFit('E2B2LHregCa.fit')
+def plotB2reg(prefix=''):
+    w=loadStanFit(prefix+'revE2B2LHregCa.fit')
     px=np.array(np.linspace(-0.5,0.5,101),ndmin=2)
-    d=w['a4']
     a1=np.array(w['ma'][:,4],ndmin=2).T+1
     a0=np.array(w['ma'][:,3],ndmin=2).T
     printCI(w,'ma')
@@ -274,7 +275,7 @@ def plotB2reg():
     ax.add_patch(plt.Polygon(np.array([x,y]).T,alpha=0.2,fill=True,fc='red',ec='w'))
     mus=[]
     for m in range(len(man)):
-        mus.append(loadStanFit('E2B2LHC%d.fit'%m)['ma4']+man[m])
+        mus.append(loadStanFit(prefix+'revE2B2LHC%d.fit'%m)['ma4']+man[m])
     mus=np.array(mus).T
     errorbar(mus,x=man)
     ax.set_xticks(man)
@@ -361,7 +362,7 @@ def plotB5(B5s,vpns,clrs=None,exps=[1],suffix=''):
     return res
 
 def plotB2Wreg():
-    w=loadStanFit('E2B2WHreg.fit')
+    w=loadStanFit('revE2B2WHreg.fit')
     a1=np.array(w['ma1'],ndmin=2).T
     a0=np.array(w['ma0'],ndmin=2).T
     px=np.array(np.linspace(-0.5,0.5,101),ndmin=2)
@@ -376,7 +377,7 @@ def plotB2Wreg():
     ax.add_patch(plt.Polygon(np.array([x,y]).T,alpha=0.2,fill=True,fc='red',ec='red'))
     mus=[];man=np.array([-0.4,-0.2,0,0.2,0.4])
     for m in range(len(man)):
-        mus.append(loadStanFit('E2B2WBB%d.fit'%m)['mmu'])
+        mus.append(loadStanFit('revE2B2WBB%d.fit'%m)['mmu'])
     mus=np.array(mus).T
     errorbar(mus,x=man)
     ax.set_xticks(man)
@@ -404,7 +405,7 @@ def plotB3(B3,clrs=None,exp=1):
         #plt.title('Displacement in Degrees')
         
 def plotB3reg():
-    w=loadStanFit('E2B3BHreg.fit')
+    w=loadStanFit('revE2B3BHreg.fit')
     printCI(w,'mmu')
     printCI(w,'mr')
     for b in range(2):
@@ -425,7 +426,7 @@ def plotB3reg():
         man=np.array([-0.4,-0.2,0,0.2,0.4])
         mus=[]
         for m in range(len(man)):
-            mus.append(loadStanFit('E2B3BH%d.fit'%m)['mmu'][:,b])
+            mus.append(loadStanFit('revE2B3BH%d.fit'%m)['mmu'][:,b])
         mus=np.array(mus).T
         errorbar(mus,x=man)
         ax.set_xticks(man)
@@ -550,16 +551,17 @@ def plotComp():
     E=[]
     for i in range(1,3):
         D=[]
-        if i==2: w=loadStanFit('E2B2LHregCa.fit')
-        else: w=loadStanFit('E1B1LH.fit')
+        if i==2: w=loadStanFit('revE2B2LHregCa.fit')
+        else: w=loadStanFit('revE1B1LH.fit')
         D.append(w['ma'][:,3])
         if i==2: 
-            w=loadStanFit('E%dB2WHreg.fit'%i)
+            w=loadStanFit('revE%dB2WHreg.fit'%i)
             D.append((w['ma0']-0.5)/w['ma1'])
-            w=loadStanFit('E%dB3BHreg.fit'%i)
+            printCI(D[-1])
+            w=loadStanFit('revE%dB3BHreg.fit'%i)
         else:
             D.append([])
-            w=loadStanFit('E1B3BH.fit')
+            w=loadStanFit('revE1B3BH.fit')
         D.append(w['mmu'][:,0])
         if i==2:vpn=range(351,381); vpn.remove(369); vpn.remove(370)
         else: vpn=range(301,314)
@@ -598,6 +600,19 @@ def plotComp():
         plt.ylabel(['Bugs','Darts'][k],fontsize=14)
         ax.set_yticklabels(['','Location Recall','Leave-Me-Alone',
             'Distance Bisection','Static Recall','Static Localization'])
+
+def plotEvalTraj():
+    figure()
+    R=np.squeeze(np.load('Rdpsex.npy'))
+    R=stats.nanmedian(R,axis=2)[:,1:,:]
+    dps=np.linspace(-0.3,0.5,101)[1:]
+    plt.plot(dps,R[:,:,2].mean(0));
+    mn=np.argmin(R,axis=1)
+    y=np.random.randn(mn.shape[0])*0.00002+0.0441
+    plt.plot(np.sort(dps[mn[:,2]]),y,'+k',mew=1,ms=4)
+    plt.xlabel('Displacement')
+    plt.ylabel('Average Net Force')
+    print dps[mn[:,2]].mean()
 
 def saveFigures():
     vpna=range(301,314)
@@ -660,6 +675,9 @@ def saveFigures():
 
     plotComp()
     plt.savefig(FIGPATH+'compar')
+
+    plotEvalTraj()
+    plt.savefig(FIGPATH+'evalTraj')
     
 def plotExp():    
     figure(figsize=[FIGCOL[2],FIGCOL[2]*0.35])

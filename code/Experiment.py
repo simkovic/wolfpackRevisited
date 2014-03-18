@@ -386,20 +386,62 @@ class TobiiExperiment(Gao10e3Experiment):
         self.eyeTracker.sendMessage('Omission')
         Gao10e3Experiment.omission(self)
 
+def computeState(isFix,md,nfm=np.inf):
+    fixations=[]
+    if isFix.sum()==0: return np.int32(isFix),[]
+    fixon = np.bitwise_and(isFix,
+        np.bitwise_not(np.roll(isFix,1))).nonzero()[0].tolist()
+    fixoff=np.bitwise_and(np.roll(isFix,1),
+        np.bitwise_not(isFix)).nonzero()[0].tolist()
+    if len(fixon)==0 and len(fixoff)==0: fixon=[0]; fixoff=[isFix.size-1]
+    if fixon[-1]>fixoff[-1]:fixoff.append(isFix.shape[0]-1)
+    if fixon[0]>fixoff[0]:fixon.insert(0,0)
+    if len(fixon)!=len(fixoff): print 'invalid fixonoff';raise TypeError
+    for f in range(len(fixon)):
+        fs=fixon[f];fe=(fixoff[f]+1);dur=fe-fs
+        if  dur<md[0] or dur>md[1]:
+            isFix[fs:fe]=False
+        else: fixations.append([fs,fe-1])
+    return isFix,fixations
 
 class MouseFromData():
-    def __init__(self,vp,b,tr,pointer):
-        self.vp=vp
+    def __init__(self,vp,b,tr,pointer,EVENTS=False):
+        self.vp=vp;self.EVENTS=EVENTS
         self.b=b
         self.tr=tr
         self.data=np.load(Q.inputPath+'vp%03d/chsVp%03db%dtrial%03d.npy' % (vp,vp,b,tr))
-        self.f=0
+        if self.EVENTS:
+            vth=15;md=0.3;
+            from EvalTraj import computeState
+            from scipy import stats
+            filt=stats.norm.pdf(np.linspace(-3,3,7),0,1)
+            filt/=filt.sum()
+            vel=np.linalg.norm(np.diff(self.data,axis=0),axis=1)*Q.refreshRate
+            vel=np.convolve(vel,filt)
+            self.sel,self.events=computeState(vel<vth,md=[md*Q.refreshRate,np.inf])
+            for e in self.events:
+                e.extend([self.data[e[0]:e[1],0].mean(),self.data[e[0]:e[1],1].mean()])
+            print len(self.events[0])
+        self.f=0;self.fixcount=-1;self.fixon=False;self.fixdur=0
         self.pointer=pointer
+        self.fixpoint=visual.Circle(pointer.win,radius=0.1,fillColor='yellow',lineColor=None,interpolate=False)
 
     def getPressed(self): return (1,1,1)
     def getClicks(self): return [np.inf,np.inf,np.inf]
     def clickReset(self): pass
     def draw(self):
+        if self.EVENTS:
+            if self.fixdur==0 and self.sel[self.f]:
+                self.fixdur=1
+                self.fixcount+=1
+            elif self.fixdur>0 and not self.sel[self.f]: self.fixdur=0
+            if self.fixdur>0: 
+                self.fixdur+=1
+                self.fixpoint.setPos(self.events[self.fixcount][2:])
+            else: self.fixpoint.setPos(self.data[self.f,:2])
+            self.fixpoint.setRadius(0.2+self.fixdur*0.01)
+            self.fixpoint.draw()
+        if self.f==0:self.pointer.setRadius(0.2)
         self.pointer.setPos(self.data[self.f,:2])
         self.pointer.draw()
         self.f+=1
@@ -411,15 +453,15 @@ class MouseFromData():
         print 'Warning: setting data position',self.getPos(),pos
     
 class DataReplay(Gao10e3Experiment):
-    def __init__(self):
+    def __init__(self,gazefilter=None):
         Gao10e3Experiment.__init__(self,of='datareplay.res')
         dat=np.loadtxt(Q.outputPath+'vp%03d.res'%self.id)
         self.aas= dat[dat[:,1]==2,:]
         self.aas=self.aas[:,[4,6,7]]
     def flip(self):
         Gao10e3Experiment.flip(self)
-        self.wind.getMovieFrame()
-        self.wind.saveMovieFrames(Q.outputPath+'vid%03d.png'%(self.f))
+        #self.wind.getMovieFrame()
+        #self.wind.saveMovieFrames(Q.outputPath+'vid%03d.png'%(self.f))
         
     def getJudgment(self): pass
     def runBlock3(self): pass
