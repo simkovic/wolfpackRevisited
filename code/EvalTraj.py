@@ -76,8 +76,8 @@ def plotForceField(mouse,points,delta=0.,cm=0.):
     plt.cla()
     c=plt.Circle((0,0),radius=11.75,fill=False)
     plt.gca().add_patch(c)
-    plt.plot(points[:,0],points[:,1],'kv',ms=14)
-    plt.plot(mouse[0],mouse[1],'go',ms=16)
+    plt.plot(points[:,0],points[:,1],'ks',ms=8)
+    plt.plot(mouse[0],mouse[1],'go',ms=8)
     plt.xlim([-12,12])
     plt.ylim([-12,12])
     plt.gca().set_aspect(1)
@@ -87,8 +87,12 @@ def plotForceField(mouse,points,delta=0.,cm=0.):
     #plt.pcolormesh(rng,rng,np.linalg.norm(R,axis=2).T)
     loc,minforce,ms=findNearestLocalMin(points[:,:2],start=np.copy(mouse[:2]),
                                         circlemass=cm)
-    plt.plot(loc[0],loc[1],'bd',ms=14)
+    plt.plot(loc[0],loc[1],'bd',ms=8)
     plt.grid(b=False)
+    ax=plt.gca()
+    ax.spines['top'].set_visible(True)
+    ax.spines['right'].set_visible(True)
+    ax.set_xticklabels([]);ax.set_yticklabels([])
 
 def plotFF(vp=351,b=0,t=0,f=675,foffset=0,cm=0.):
     ''' foffset - frame offset correction between point and mouse coords '''
@@ -171,7 +175,7 @@ if __name__=='__main__':
         cm=np.array(cm)
         R=measureFit(vpn,fms=[-15],cms=[0.8],dps=dpss,eventbased=True,
                      vpcms=cm,fshift=[0,8,15,23][sel-6])
-    np.save(fns[sel]+str(sel-5),R)
+    np.save(fns[6]+str(sel-5),R)
     if sel<6:
         np.save('dps',dpss)
         np.save('fms',fmss)

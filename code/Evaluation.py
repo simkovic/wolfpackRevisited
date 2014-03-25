@@ -46,7 +46,7 @@ CHR=0.3 # radius of the green circle in deg
 AR=0.95 # radius of distractor circles in deg
 MAXD=4 # maximum accepted displacement magnitude in judgment task, inclusion criterion for stats
 MONHZ=75 # monitor frame rate in hz
-FIGCOL=[3.27,4.86,6.83] # width of figure for a 1,1.5 and 2 column layout of plosone article
+#FIGCOL=[3.27,4.86,6.83] # width of figure for a 1,1.5 and 2 column layout of plosone article
 CoM=(1-3**0.5/2)*AR # shift of the origin due to center of mass (dart) 
 
 def drawCircularAgent(pos,scale=1,eyes=True,ori=0,bcgclr=True,rc=[0.7]*3):
@@ -548,9 +548,12 @@ def plotGao(D):
     plt.ylabel('Prop. of Time in Wolfpack Quadrants')
     
 def plotComp():
-    E=[]
-    for i in range(1,3):
-        D=[]
+    #E=[]
+    D=[]
+    for i in [1,2]:
+        if i==2:
+            find= len(D)
+            D.append(np.load('force.npy'))
         if i==2: w=loadStanFit('revE2B2LHregCa.fit')
         else: w=loadStanFit('revE1B1LH.fit')
         D.append(w['ma'][:,3])
@@ -560,7 +563,6 @@ def plotComp():
             printCI(D[-1])
             w=loadStanFit('revE%dB3BHreg.fit'%i)
         else:
-            D.append([])
             w=loadStanFit('revE1B3BH.fit')
         D.append(w['mmu'][:,0])
         if i==2:vpn=range(351,381); vpn.remove(369); vpn.remove(370)
@@ -570,49 +572,68 @@ def plotComp():
         plt.close()
         D.append(b4[0])
         D.append(b4[1])
-        E.append(D)
-    figure(figsize=[FIGCOL[1],FIGCOL[0]])
-    for k in range(2):
-        D=E[k]
-        subplot(2,1,k+1)
-        clr=(0.2, 0.5, 0.6)
-        for i in range(len(D)):
-            if i==1 and k==0: continue
-            if i<3:
-                plt.plot([sap(D[i],2.5),sap(D[i],97.5) ],[i+1,i+1],color=clr)
-                plt.plot([sap(D[i],25),sap(D[i],75) ],[i+1,i+1],
-                         color=clr,lw=3,solid_capstyle='round')
-                plt.plot([D[i].mean()],[i+1],mfc=clr,mec=clr,ms=8,marker='+',mew=2)
-            else:
-                err= D[i][2]* stats.t.ppf(0.975,D[i][3])
-                plt.plot([D[i][1]-err, D[i][1]+err],[i+1,i+1],color=clr)
-                err= D[i][2]* stats.t.ppf(0.75,D[i][3])
-                plt.plot([D[i][1]-err, D[i][1]+err],[i+1,i+1],
-                         color=clr,lw=3,solid_capstyle='round')
-                plt.plot([D[i][1]],[i+1],mfc=clr,mec=clr,ms=8,marker='+',mew=2)
-        ax=plt.gca()       
-        plt.ylim([0,len(D)+1])
-        if k==1: plt.xlabel('Perceived Displacement')
-        else: ax.set_xticklabels([])
-        plt.xlim([-0.05,0.4])
-        #subplot_annotate(loc=[0.95,0.9])
-        plt.grid()
-        plt.ylabel(['Bugs','Darts'][k],fontsize=14)
-        ax.set_yticklabels(['','Location Recall','Leave-Me-Alone',
-            'Distance Bisection','Static Recall','Static Localization'])
+        #E.append(D)
+    figure(size=2,aspect=0.66)
+    clr=(0.2, 0.5, 0.6)
 
-def plotEvalTraj():
-    figure()
-    R=np.squeeze(np.load('Rdpsex.npy'))
+    for i in range(len(D)):
+        if i in [0,1,5,6,7]:
+            dat=[D[i].mean(),sap(D[i],2.5),sap(D[i],97.5),sap(D[i],25),sap(D[i],75) ]
+        elif i==find:dat=D[i]
+        else:
+            err= D[i][2]* stats.t.ppf(0.975,D[i][3])
+            err2= D[i][2]* stats.t.ppf(0.75,D[i][3])
+            dat=[D[i][1],D[i][1]-err, D[i][1]+err,D[i][1]-err2, D[i][1]+err2]
+        inc=[1,2][int(i>3)]
+        plt.plot([dat[1],dat[2]],[i+inc,i+inc],color=clr)
+        plt.plot([dat[3],dat[4]],[i+inc,i+inc],
+            color=clr,lw=3,solid_capstyle='round')
+        plt.plot([dat[0]],[i+inc],mfc=clr,mec=clr,ms=8,marker='+',mew=2)
+    ax=plt.gca()
+    plt.ylim([0,len(D)+2])
+    plt.xlabel('Perceived Displacement')
+    plt.xlim([-0.05,0.4])
+    #subplot_annotate(loc=[0.95,0.9])
+    plt.grid()
+    plt.ylabel('Bugs'+' '*15+'Darts',fontsize=14)
+    ax.set_yticks(range(1,len(D)+2))
+    ax.set_yticklabels(['Location Recall','Distance Bisection',
+        'Static Recall','Static Localization','','Mouse Position','Location Recall',
+        'Leave-Me-Alone','Distance Bisection','Static Recall',
+                    'Static Localization'])
+
+def plotForce():
+    figure(size=3,aspect=0.5)
+    subplot(1,2,1)
+    from EvalTraj import plotFF
+    plotFF(vp=351,t=28,f=900,cm=0.6,foffset=8)
+    subplot_annotate()
+    
+    subplot(1,2,2)
+    for i in [1,2,3,4]:
+        R=np.squeeze(np.load('Rdpse%d.npy'%i))
+        R=stats.nanmedian(R,axis=2)[:,1:,:]
+        dps=np.linspace(-1,1,201)[1:]
+        plt.plot(dps,R[:,:,2].mean(0));
+    plt.legend([0,0.1,0.2,0.3],loc=3) 
+    i=2
+    R=np.squeeze(np.load('Rdpse%d.npy'%i))
     R=stats.nanmedian(R,axis=2)[:,1:,:]
-    dps=np.linspace(-0.3,0.5,101)[1:]
-    plt.plot(dps,R[:,:,2].mean(0));
     mn=np.argmin(R,axis=1)
-    y=np.random.randn(mn.shape[0])*0.00002+0.0441
-    plt.plot(np.sort(dps[mn[:,2]]),y,'+k',mew=1,ms=4)
+    y=np.random.randn(mn.shape[0])*0.00002+0.0438
+    plt.plot(np.sort(dps[mn[:,2]]),y,'+',mew=1,ms=6,mec=[ 0.39  ,  0.76,  0.64])
     plt.xlabel('Displacement')
     plt.ylabel('Average Net Force')
-    print dps[mn[:,2]].mean()
+    hh=dps[mn[:,2]]
+    err=np.std(hh)/np.sqrt(hh.shape[0])*stats.t.ppf(0.975,hh.shape[0])
+    err2=np.std(hh)/np.sqrt(hh.shape[0])*stats.t.ppf(0.75,hh.shape[0])
+    m=np.mean(hh)
+    print m, m-err,m+err
+    np.save('force',[m, m-err,m+err,m-err2,m+err2])
+    plt.xlim([-0.5,0.5])
+    plt.ylim([0.0435,0.046])
+    plt.grid(b=True,axis='x')
+    subplot_annotate()
 
 def saveFigures():
     vpna=range(301,314)
@@ -620,11 +641,11 @@ def saveFigures():
     vpnb=range(351,381); vpnb.remove(369); vpnb.remove(370)
     B3b,B4,B5b=loadDataB345(vpnb)
 
-    figure(figsize=[FIGCOL[2]]*2)
+    figure(size=3)
     plotB5([B5a,B5b[:18,:,:],B5b[18:,:,:]],[vpna,vpnb[:18],vpnb[18:]],exps=[1,2,2])
     plt.savefig(FIGPATH+'b5')
 
-    figure(figsize=[FIGCOL[0],FIGCOL[0]*1.4])
+    figure(size=1,aspect=1.4)
     subplot(2,1,1);plt.grid(axis='y')
     plotB3(B3a)
     plt.text(plt.xlim()[0]+0.1*(plt.xlim()[1]-plt.xlim()[0]),
@@ -641,46 +662,46 @@ def saveFigures():
     plt.savefig(FIGPATH+'b3')
 
     D=loadDataB12(vpna)
-    figure(figsize=(FIGCOL[1],0.9*FIGCOL[1]),tight_layout=False)
+    figure(size=2,aspect=0.9,tight_layout=False)
     plotB1(D)
     plt.savefig(FIGPATH+'b1')
 
-    figure(figsize=(FIGCOL[1],FIGCOL[0]))
+    figure(size=2,aspect=0.7)
     plotB3reg()
     plt.savefig(FIGPATH+'b3reg')
 
-    figure(figsize=(FIGCOL[0],1.15*FIGCOL[0]))
+    figure(size=1, aspect=1.15)
     plotB2reg()
     plt.savefig(FIGPATH+'b2reg')
 
-    figure(figsize=(FIGCOL[0],0.8*FIGCOL[0]))
+    figure(size=1, aspect=0.8)
     plotB2Wreg()
     plt.savefig(FIGPATH+'lmaReg')
 
-    figure(figsize=[FIGCOL[0]]*2)
+    figure(size=1)
     plotManipulation()
     plt.savefig(FIGPATH+'man')
 
-    figure(figsize=[FIGCOL[0]]*2)
+    figure(size=1)
     plotRotation()
     plt.savefig(FIGPATH+'rot')
 
-    figure(figsize=(FIGCOL[0],FIGCOL[0]*0.8),tight_layout=True)
+    figure(size=1,aspect=0.8,tight_layout=True)
     plotGao(D)
     plt.savefig(FIGPATH+'gao')
 
-    figure(figsize=[FIGCOL[0]]*2)
+    figure(size=1)
     plotVectors()
     plt.savefig(FIGPATH+'vectors')
 
+    plotForce()
+    plt.savefig(FIGPATH+'force')
+
     plotComp()
     plt.savefig(FIGPATH+'compar')
-
-    plotEvalTraj()
-    plt.savefig(FIGPATH+'evalTraj')
     
 def plotExp():    
-    figure(figsize=[FIGCOL[2],FIGCOL[2]*0.35])
+    figure(size=2,aspect=0.35)
     for i in range(3):
         subplot(1,3,1+i)
         plt.gca().set_axis_off()
@@ -694,6 +715,8 @@ def plotExp():
 
 
 if __name__ == '__main__':
-    mpl.rcParams['savefig.format'] = 'tiff'
+    mpl.rcParams['savefig.format'] = 'png'
     saveFigures()
+    #plotComp()
+    #plt.savefig(FIGPATH+'compar')
 
