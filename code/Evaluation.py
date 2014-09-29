@@ -263,7 +263,7 @@ def plotB2reg(prefix=''):
     a1=np.array(w['ma'][:,4],ndmin=2).T+1
     a0=np.array(w['ma'][:,3],ndmin=2).T
     printCI(w,'ma')
-    y=np.concatenate([sap(a0+a1*px,97.5),sap(a0+a1*px[:,::-1],2.5)])
+    y=np.concatenate([sap(a0+a1*px,97.5,axis=0),sap(a0+a1*px[:,::-1],2.5,axis=0)])
     x=np.squeeze(np.concatenate([px,px[:,::-1]],axis=1))
     man=np.array([-0.4,-0.2,0,0.2,0.4])
     plt.plot(px[0,:],np.median(a0)+np.median(a1)*px[0,:],'red')
@@ -271,7 +271,7 @@ def plotB2reg(prefix=''):
     ax=plt.gca()
     ax.set_aspect(1)
     ax.add_patch(plt.Polygon(np.array([x,y]).T,alpha=0.2,fill=True,fc='red',ec='w'))
-    y=np.concatenate([sap(a0+a1*px,75),sap(a0+a1*px[:,::-1],25)])
+    y=np.concatenate([sap(a0+a1*px,75,axis=0),sap(a0+a1*px[:,::-1],25,axis=0)])
     ax.add_patch(plt.Polygon(np.array([x,y]).T,alpha=0.2,fill=True,fc='red',ec='w'))
     mus=[]
     for m in range(len(man)):
@@ -367,13 +367,13 @@ def plotB2Wreg():
     a0=np.array(w['ma0'],ndmin=2).T
     px=np.array(np.linspace(-0.5,0.5,101),ndmin=2)
     printCI(w,'ma0');printCI(w,'ma1')
-    y=np.concatenate([sap(a0+a1*px,97.5),sap(a0+a1*px[:,::-1],2.5)])
+    y=np.concatenate([sap(a0+a1*px,97.5,axis=0),sap(a0+a1*px[:,::-1],2.5,axis=0)])
     x=np.squeeze(np.concatenate([px,px[:,::-1]],axis=1))
     plt.plot(px[0,:],np.median(a0)+np.median(a1)*px[0,:],'red')
     #plt.plot([-1,1],[0.5,0.5],'grey')
     ax=plt.gca()
     ax.add_patch(plt.Polygon(np.array([x,y]).T,alpha=0.2,fill=True,fc='red',ec='red'))
-    y=np.concatenate([sap(a0+a1*px,75),sap(a0+a1*px[:,::-1],25)])
+    y=np.concatenate([sap(a0+a1*px,75,axis=0),sap(a0+a1*px[:,::-1],25,axis=0)])
     ax.add_patch(plt.Polygon(np.array([x,y]).T,alpha=0.2,fill=True,fc='red',ec='red'))
     mus=[];man=np.array([-0.4,-0.2,0,0.2,0.4])
     for m in range(len(man)):
@@ -414,14 +414,14 @@ def plotB3reg():
         px=np.array(np.linspace(-0.5,0.5,101),ndmin=2)
         a0=np.array(w['mmu'][:,b],ndmin=2).T
         a1=np.array(w['mr'][:,b],ndmin=2).T
-        y=np.concatenate([sap(a0+a1*px,97.5),sap(a0+a1*px[:,::-1],2.5)])
+        y=np.concatenate([sap(a0+a1*px,97.5,axis=0),sap(a0+a1*px[:,::-1],2.5,axis=0)])
         x=np.squeeze(np.concatenate([px,px[:,::-1]],axis=1))
         plt.plot(px[0,:],np.median(a0)+np.median(a1)*px[0,:],'red')
         #plt.plot([-1,1],[0.5,0.5],'grey')
         ax=plt.gca()
         ax.set_aspect(1)
         ax.add_patch(plt.Polygon(np.array([x,y]).T,alpha=0.2,fill=True,fc='red',ec='w'))
-        y=np.concatenate([sap(a0+a1*px,75),sap(a0+a1*px[:,::-1],25)])
+        y=np.concatenate([sap(a0+a1*px,75,axis=0),sap(a0+a1*px[:,::-1],25,axis=0)])
         ax.add_patch(plt.Polygon(np.array([x,y]).T,alpha=0.2,fill=True,fc='red',ec='w'))
         man=np.array([-0.4,-0.2,0,0.2,0.4])
         mus=[]
@@ -711,11 +711,12 @@ def plotExp():
             str(unichr(65+i)),horizontalalignment='center',color='w',
             verticalalignment='center',fontdict={'weight':'bold'},fontsize=12)
     plt.subplots_adjust(bottom=0,top=1,wspace=-0.5,left=0,right=1)
-    plt.savefig(FIGPATH+'exp',dpi=400,bbox_inches='tight')
+    plt.savefig(FIGPATH+'exp',bbox_inches='tight')
 
 
 if __name__ == '__main__':
-    mpl.rcParams['savefig.format'] = 'png'
+    mpl.rcParams['savefig.format'] = 'jpg'
+    mpl.rcParams['savefig.dpi']=900
     saveFigures()
     #plotComp()
     #plt.savefig(FIGPATH+'compar')
