@@ -281,7 +281,7 @@ def plotB2reg(prefix=''):
     ax.set_xticks(man)
     plt.xlim([-0.5,0.5])
     plt.ylim([-0.6,0.8])
-    plt.xlabel('Nominal Displacement')
+    plt.xlabel('Pivot Displacement')
     plt.ylabel('Perceived Displacemet')
     
 def plotB5(B5s,vpns,clrs=None,exps=[1],suffix=''):
@@ -383,7 +383,7 @@ def plotB2Wreg():
     ax.set_xticks(man)
     plt.xlim([-0.5,0.5])
     plt.ylim([0.4,0.56])
-    plt.xlabel('Nominal Displacement')
+    plt.xlabel('Pivot Displacement')
     plt.ylabel('Prop. of Time in Wolfpack Quadrants')
     
 def plotB3(B3,clrs=None,exp=1):
@@ -437,7 +437,7 @@ def plotB3reg():
             plt.ylabel('Perceived Displacemet')
             plt.gca().set_yticklabels([])
         subplot_annotate()
-    plt.text(-1.1,-0.6,'Nominal Displacement',fontsize=8);
+    plt.text(-1.1,-0.6,'Pivot Displacement',fontsize=8);
 
 def plotB3fit(fit,suffix='',pars=['mu','mmu']):
     plt.figure(figsize=(6,3))
@@ -508,6 +508,7 @@ def plotManipulation():
     plt.plot(man[0],[0]*2,'ok')
     plt.plot(man[1],[0]*2,'xk',ms=8,mew=2)
     #plt.gca().set_yticks([])
+    plt.xlabel('Pivot Displacement')
     
 def plotRotation():
     plt.grid(axis='y')
@@ -622,8 +623,8 @@ def plotForce():
     mn=np.argmin(R,axis=1)
     y=np.random.randn(mn.shape[0])*0.00002+0.0438
     plt.plot(np.sort(dps[mn[:,2]]),y,'+',mew=1,ms=6,mec=[ 0.39  ,  0.76,  0.64])
-    plt.xlabel('Displacement')
-    plt.ylabel('Average Net Force')
+    plt.xlabel('Displacement of Force Origin')
+    plt.ylabel('Average Net Force Magnitude')
     hh=dps[mn[:,2]]
     err=np.std(hh)/np.sqrt(hh.shape[0])*stats.t.ppf(0.975,hh.shape[0])
     err2=np.std(hh)/np.sqrt(hh.shape[0])*stats.t.ppf(0.75,hh.shape[0])
