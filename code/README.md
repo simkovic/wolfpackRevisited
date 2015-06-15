@@ -20,12 +20,15 @@ Python Code
 
 * Evaluation.py - contains functions used in the analyses
 
+* Trajectory.py - used to generate the trajectories
+
 * Experiment.py - run the experiment and replay data
+
+* Tobii.py - eyetracker controller
 
 * Settings.py - settings for the experiment
 
 * Constants.py - constants used by the experiment
-
 
 Dependencies
 -----------
