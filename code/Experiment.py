@@ -33,7 +33,7 @@ try: from eyetracking.Tobii import TobiiController
 except: print 'Tobii import failed'
 
  
-class Gao10e3Experiment():
+class Experiment():
     def __init__(self,of=None):
         # ask infos
         myDlg = gui.Dlg(title="Experiment zur Bewegungswahrnehmung",pos=Q.guiPos)   
@@ -364,27 +364,27 @@ class Gao10e3Experiment():
     def getf(self):
         return self.f
         
-class TobiiExperiment(Gao10e3Experiment):
+class TobiiExperiment(Experiment):
     def __init__(self):
-        Gao10e3Experiment.__init__(self)
+        Experiment.__init__(self)
         self.eyeTracker = TobiiController(self.wind,self.getf,sid=self.id,block=self.block)
         self.eyeTracker.sendMessage('Monitor Distance\t%f'% self.wind.monitor.getDistance())
         self.eyeTracker.doMain()
     def run(self):
-        Gao10e3Experiment.run(self)
+        Experiment.run(self)
         self.eyeTracker.closeConnection()
     def runTrial(self,*args):
         self.eyeTracker.preTrial(False)#self.t,False,self.getWind(),autoDrift=True)
         self.eyeTracker.sendMessage('Trial\t%d'%self.t)
-        Gao10e3Experiment.runTrial(self,*args)
+        Experiment.runTrial(self,*args)
         self.eyeTracker.postTrial()
     def getJudgment(self,*args):
         self.eyeTracker.sendMessage('Detection')
-        resp=Gao10e3Experiment.getJudgment(self,*args)
+        resp=Experiment.getJudgment(self,*args)
         return resp 
     def omission(self):
         self.eyeTracker.sendMessage('Omission')
-        Gao10e3Experiment.omission(self)
+        Experiment.omission(self)
 
 def computeState(isFix,md,nfm=np.inf):
     fixations=[]
@@ -452,14 +452,14 @@ class MouseFromData():
     def _setPos(self,pos):
         print 'Warning: setting data position',self.getPos(),pos
     
-class DataReplay(Gao10e3Experiment):
+class DataReplay(Experiment):
     def __init__(self,gazefilter=None):
-        Gao10e3Experiment.__init__(self,of='datareplay.res')
+        Experiment.__init__(self,of='datareplay.res')
         dat=np.loadtxt(Q.outputPath+'vp%03d.res'%self.id)
         self.aas= dat[dat[:,1]==2,:]
         self.aas=self.aas[:,[4,6,7]]
     def flip(self):
-        Gao10e3Experiment.flip(self)
+        Experiment.flip(self)
         #self.wind.getMovieFrame()
         #self.wind.saveMovieFrames(Q.outputPath+'vid%03d.png'%(self.f))
         
@@ -473,8 +473,8 @@ class DataReplay(Gao10e3Experiment):
 
 if __name__ == '__main__':
     #E=TobiiExperiment() # uncomment to run eyetracking experiment
-    #E=Gao10e3Experiment() # uncomment to run behavioral experiment
-    E=DataReplay() # uncomment to replay data
+    E=Experiment() # uncomment to run behavioral experiment
+    #E=DataReplay() # uncomment to replay data
     
     E.run()
 

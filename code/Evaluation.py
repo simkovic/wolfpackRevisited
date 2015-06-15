@@ -210,7 +210,7 @@ def plotB1(D,exp=1):
     clrs=getColors(D.shape[0])
     
     titles=['Raw Displacement','Representational Momentum',
-           'Lazy Hand Gravity','Orientation']
+           'Hand Inertia','Orientation']
     spid=[1,3,6,4]
     for i in range(D.shape[0]):
         k=0
@@ -574,9 +574,8 @@ def plotComp():
         D.append(b4[0])
         D.append(b4[1])
         #E.append(D)
-    figure(size=2,aspect=0.66)
     clr=(0.2, 0.5, 0.6)
-
+    figure(size=3,aspect=0.5)#0.66)
     for i in range(len(D)):
         if i in [0,1,5,6,7]:
             dat=[D[i].mean(),sap(D[i],2.5),sap(D[i],97.5),sap(D[i],25),sap(D[i],75) ]
@@ -642,7 +641,7 @@ def saveFigures():
     vpnb=range(351,381); vpnb.remove(369); vpnb.remove(370)
     B3b,B4,B5b=loadDataB345(vpnb)
 
-    figure(size=3)
+    figure(size=2)
     plotB5([B5a,B5b[:18,:,:],B5b[18:,:,:]],[vpna,vpnb[:18],vpnb[18:]],exps=[1,2,2])
     plt.savefig(FIGPATH+'b5')
 
@@ -663,7 +662,7 @@ def saveFigures():
     plt.savefig(FIGPATH+'b3')
 
     D=loadDataB12(vpna)
-    figure(size=2,aspect=0.9,tight_layout=False)
+    figure(size=3,aspect=0.9,tight_layout=False)
     plotB1(D)
     plt.savefig(FIGPATH+'b1')
 

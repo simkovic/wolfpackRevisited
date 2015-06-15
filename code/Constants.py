@@ -24,6 +24,8 @@ import numpy as np
 # some constants .
 WINDOWS=1
 LINUX=0
+MIN=0
+MAX=1
 X=0;Y=1;PHI=2;T=2
 CHASEE=0; CHASER=1; DISTRACTOR=2
 

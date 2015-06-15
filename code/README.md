@@ -37,6 +37,14 @@ Dependencies
 
 * [PyStan](http://pystan.readthedocs.org/en/latest/) for statistical inference
 
-* [Tobii.py from Eyetracker](http://github.com/simkovic/eyetracking/blob/master/Tobii.py) to run eyetracking experiment
+Looking to Reuse Code?
+=======
 
-* [matusplotlib](https://github.com/simkovic/matusplotlib/) to reproduce the figures
+The code in this repository is meant as an documentation for the published research. The code has not been developed since the publication and may no longer work with the latest versions of its dependencies (such as Psychopy or PyStan). If you are interested in an maintained and (hopefully) up-to-date version of my code please have a look at the following repositories:
+
+* [goal-directed motion toolkit](https://github.com/simkovic/GoalDirectedMotionToolkit) to create Stimuli and run Experiments
+
+* [eyetracker](https://github.com/simkovic/eyetracking) to run Eyetracking experiments with Psychopy
+
+* [matusplotlib](https://github.com/simkovic/matusplotlib/) to plot figures
+
