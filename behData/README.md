@@ -12,7 +12,7 @@ In blocks 0 and 1 the columns give:
 
 4. trial id 
 
-5. quadrant layout (see [Evaluation.py](https://github.com/simkovic/wolfpackRevisited/blob/master/code/Evaluation.py#L19) for details)
+5. quadrant layout ID, the IDs 0-5 correspond to quadrants [1,1,0,0],[0,0,1,1],[0,1,0,1],[1,0,1,0],[1,0,0,1],[0,1,1,0] where the position of the quadrants is [NE,NW,SE,SW] and 1 indicates presence of wolfpack
 
 6. nominal displacement in degrees
 
