@@ -35,20 +35,22 @@ except: print 'Tobii import failed'
  
 class Experiment():
     def __init__(self,of=None):
-        # ask infos
+        # ask subject the information
         myDlg = gui.Dlg(title="Experiment zur Bewegungswahrnehmung",pos=Q.guiPos)   
         myDlg.addText('VP Infos')   
         myDlg.addField('Subject ID:',0)
         myDlg.addField('Block:',0)
-        myDlg.addField('Alter:', 21)
-        myDlg.addField('Geschlecht (m/w):',choices=(u'weiblich',u'maennlich'))
-        myDlg.addField(u'Händigkeit:',choices=('rechts','links'))
-        myDlg.addField(u'Dominantes Auge:',choices=('rechts','links'))
-        myDlg.addField(u'Sehschärfe: ',choices=('korrigiert','normal'))
+        myDlg.addField('Alter:', 21) #age
+        myDlg.addField('Geschlecht (m/w):',choices=(u'weiblich',u'maennlich'))#gender
+        myDlg.addField(u'Händigkeit:',choices=('rechts','links'))# handedness
+        myDlg.addField(u'Dominantes Auge:',choices=('rechts','links')) #dominant eye
+        myDlg.addField(u'Sehschärfe: ',choices=('korrigiert','normal')) # acuity
+        # hours per week spent at screen
         myDlg.addField(u'Wochenstunden vor dem Komputerbildschirm:', choices=('0','0-2','2-5','5-10','10-20','20-40','40+'))
+        # hours per week playing computer games
         myDlg.addField(u'Wochenstunden Komputerspielen:', choices=('0','0-2','2-5','5-9','10-20','20+'))
-        myDlg.addField('Starte bei Trial:', 0)
-        myDlg.addField(u'Stimulus:',choices=('dart','eyes'))
+        myDlg.addField('Starte bei Trial:', 0) # starting trial, for debug only
+        myDlg.addField(u'Stimulus:',choices=('dart','eyes')) # shape of the stimulus
         myDlg.show()#show dialog and wait for OK or Cancel
         vpInfo = myDlg.data
         if myDlg.OK:#then the user pressed OK
@@ -122,6 +124,7 @@ class Experiment():
         self.wind.flip()
             
     def getJudgment(self):
+        ''' asks information after the trial presentation ended'''
         qmap=self.quadMaps[int(self.trialType[self.t])]
         if self.block!=2:
             self.mouse.clickReset()
@@ -184,7 +187,7 @@ class Experiment():
     def runTrial(self,replay=False):
         self.repmom=self.manipType[self.t]
         print self.t
-        if self.block==2:
+        if self.block==2: # select the two agents
             q=np.random.permutation(4)
             q0= np.array(self.quadMaps[int(self.trialType[self.t])]).nonzero()[0]
             q1=(np.array(self.quadMaps[int(self.trialType[self.t])])==0).nonzero()[0]
@@ -205,6 +208,7 @@ class Experiment():
         else:
             self.mouse=visual.CustomMouse(self.wind, leftLimit=-lim,rightLimit=lim,
                 topLimit=lim,bottomLimit=-lim,pointer=self.pnt2)
+        # init variables
         self.chasee=np.zeros((Q.nrframes,2))*np.nan
         self.bringMouseToPosition()
         self.mouse.setPointer(self.pnt1)
@@ -219,7 +223,7 @@ class Experiment():
         self.mouse.clickReset()
         event.clearEvents() #agents[a].setLineColor(agentCLR)
         self.f=0
-        while self.f<self.nrframes:
+        while self.f<self.nrframes: # loop frames
             self.pos=self.traj[self.f,:,[X,Y]].transpose()
             self.phi=self.traj[self.f,:,PHI].squeeze()
             self.elem.setXYs(self.pos)
@@ -239,6 +243,8 @@ class Experiment():
         self.output.flush()
         
     def bringMouseToPosition(self):
+        ''' waits until the subject brings the mouse to the correct position
+            before the onset of the next trial'''
         if self.block!=2:
             mpos=np.matrix(np.random.rand(2)*23.5-11.75)
             pos0=np.copy(self.traj[0,:,:2])
@@ -262,6 +268,9 @@ class Experiment():
             pN+=1
             mp=self.mouse.getPos()
     def run(self):
+        ''' run experiment '''
+        # init variables
+        # quadrant layout, 1- wolfpack quadrants, location is [NE,NW,SE,SW]
         self.quadMaps=[[1,1,0,0],[0,0,1,1],[0,1,0,1],[1,0,1,0],[1,0,0,1],[0,1,1,0]]
         self.tone=sound.SoundPygame(value='A',secs=5)
         self.tone.onn=False
@@ -365,6 +374,7 @@ class Experiment():
         return self.f
         
 class TobiiExperiment(Experiment):
+    ''' Run eyetracking alongside the Experiment'''
     def __init__(self):
         Experiment.__init__(self)
         self.eyeTracker = TobiiController(self.wind,self.getf,sid=self.id,block=self.block)
@@ -385,7 +395,8 @@ class TobiiExperiment(Experiment):
     def omission(self):
         self.eyeTracker.sendMessage('Omission')
         Experiment.omission(self)
-
+####################################################################
+# replay functionality
 def computeState(isFix,md,nfm=np.inf):
     fixations=[]
     if isFix.sum()==0: return np.int32(isFix),[]
@@ -468,7 +479,7 @@ class DataReplay(Experiment):
     def bringMouseToPosition(self): pass
     def runTrial(self,*args):
         Gao10e3Experiment.runTrial(self,*args,replay=True)
-        
+#####################################################################       
         
 
 if __name__ == '__main__':

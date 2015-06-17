@@ -42,9 +42,11 @@ def drawCircle(M,pos,radius,value=1):
         for j in range(M.shape[1]):
             if np.sqrt((i-pos[X])**2+(j-pos[Y])**2)<radius:
                 M[i,j]=value
-    return M
-    
-N=128
+    return M   
+##########################################################
+# create masks that define various agent shapes 
+N=128 # each mask is a NxN rectangle
+# circle
 CIRCLE=np.ones((N,N))*-1
 for i in range(N):
     for j in range(N):
