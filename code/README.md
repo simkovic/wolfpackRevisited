@@ -20,7 +20,7 @@ Python Code
 
 * Evaluation.py - contains functions used in the analyses
 
-* Trajectory.py - used to generate the trajectories
+* Trajectory.py & Maze.py - generate the trajectories
 
 * Experiment.py - run the experiment and replay data
 
